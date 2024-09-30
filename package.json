@@ -1,38 +1,22 @@
 {
-  "name": "setup",
+  "name": "botactivities",
   "version": "1.0.0",
-  "description": "Setting up GraphQL with express and GraphiQL",
-  "main": "server.js",
+  "description": "Project using Apollo Server and coding with Typescript.",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "compile": "tsc",
+    "start": "npm run compile && node ./dist/index.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/feature/setup-graphql.git"
-  },
-  "keywords": [
-    "graphql",
-    "express"
-  ],
-  "author": "Sam",
+  "keywords": [],
+  "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/feature/setup-graphql/issues"
-  },
-  "homepage": "https://github.com/feature/setup-graphql#readme",
+  "type": "module",
   "dependencies": {
-    "express": "4.21.0",
-    "graphql": "16.9.0",
-    "graphql-http": "1.22.1",
-    "ruru": "2.0.0-beta.13"
+    "@apollo/server": "4.11.0",
+    "graphql": "16.9.0"
   },
   "devDependencies": {
-    "@eslint/js": "9.11.1",
-    "eslint": "9.11.1",
-    "eslint-config-prettier": "9.1.0",
-    "eslint-plugin-prettier": "5.2.1",
-    "globals": "15.9.0",
-    "prettier": "3.3.3"
+    "@types/node": "22.7.4",
+    "typescript": "5.6.2"
   }
 }
