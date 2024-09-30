@@ -1,25 +1,38 @@
 {
   "name": "setup",
   "version": "1.0.0",
-  "description": "#\u0000 \u0000b\u0000o\u0000t\u0000A\u0000c\u0000t\u0000i\u0000v\u0000i\u0000t\u0000i\u0000e\u0000s\u0000\r\u0000 \u0000",
-  "main": "index.js",
+  "description": "Setting up GraphQL with express and GraphiQL",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",
-    "url": "botActivities"
+    "url": "git+https://github.com/feature/setup-graphql.git"
   },
   "keywords": [
-    "test"
+    "graphql",
+    "express"
   ],
   "author": "Sam",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/feature/setup-graphql/issues"
+  },
+  "homepage": "https://github.com/feature/setup-graphql#readme",
   "dependencies": {
-    "body-parser": "^1.20.3",
-    "express": "^4.21.0",
-    "graphql": "^16.9.0",
-    "graphql-http": "^1.22.1",
-    "ruru": "^2.0.0-beta.13"
+    "express": "4.21.0",
+    "graphql": "16.9.0",
+    "graphql-http": "1.22.1",
+    "ruru": "2.0.0-beta.13"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.11.1",
+    "eslint": "9.11.1",
+    "eslint-config-prettier": "9.1.0",
+    "eslint-plugin-prettier": "5.2.1",
+    "globals": "15.9.0",
+    "prettier": "3.3.3"
   }
 }

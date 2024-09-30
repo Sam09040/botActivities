@@ -1,6 +1,6 @@
-var express = require('express');
+var express = require("express");
 var { createHandler } = require("graphql-http/lib/use/express");
-var { buildSchema, graphql } = require("graphql");
+var { buildSchema } = require("graphql");
 var { ruruHTML } = require("ruru/server");
 
 // Building a schema, using GraphQL schema language 
@@ -22,15 +22,6 @@ var rootValue = {
 };
    
 var app = express();
-
-// Runs the GraphQL query and prints the response
-graphql({
-    schema,
-    source: "{hello, name}",	
-    rootValue
-}).then(response => {
-    console.log(response)
-});
 
 app.get("/", (_req, res) => {
     res.type("html")
