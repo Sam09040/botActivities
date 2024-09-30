@@ -1,18 +1,27 @@
 {
   "name": "botactivities",
   "version": "1.0.0",
+<<<<<<< HEAD
   "description": "Project using Apollo Server and coding with Typescript.",
   "main": "index.js",
   "scripts": {
     "compile": "tsc",
     "start": "npm run compile && node ./dist/index.js",
     "dev": "tsx watch src/index.ts"
+=======
+  "description": "��#\u0000 \u0000b\u0000o\u0000t\u0000A\u0000c\u0000t\u0000i\u0000v\u0000i\u0000t\u0000i\u0000e\u0000s\u0000\r\u0000 \u0000",
+  "main": "index.js",
+  "scripts": {
+    "compile": "tsc",
+    "start": "npm run compile && node ./dist/index.js"
+>>>>>>> b1b5838 (Inicial setup)
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "dependencies": {
+<<<<<<< HEAD
     "@apollo/server": "4.11.0",
     "graphql": "16.9.0"
   },
@@ -27,5 +36,13 @@
     "tsx": "4.19.1",
     "typescript": "5.6.2",
     "typescript-eslint": "8.8.0"
+=======
+    "@apollo/server": "^4.11.0",
+    "graphql": "^16.9.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.4",
+    "typescript": "^5.6.2"
+>>>>>>> b1b5838 (Inicial setup)
   }
 }

@@ -1,2 +1,6 @@
+<<<<<<< HEAD
 /node_modules
 /dist/
+=======
+node_modules/
+>>>>>>> b1b5838 (Inicial setup)
