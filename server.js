@@ -1,6 +1,6 @@
-var express = require('express');
+var express = require("express");
 var { createHandler } = require("graphql-http/lib/use/express");
-var { buildSchema, graphql } = require("graphql");
+var { buildSchema } = require("graphql");
 var { ruruHTML } = require("ruru/server");
 
 // Building a schema, using GraphQL schema language 
