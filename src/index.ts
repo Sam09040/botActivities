@@ -1,6 +1,5 @@
 import { ApolloServer } from "@apollo/server";
 import { startStandaloneServer } from '@apollo/server/standalone';
-import { title } from "process";
 
 const typeDefs = `#graphql
 #Comments start wish '#' symbol
