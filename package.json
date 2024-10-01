@@ -2,6 +2,9 @@
   "name": "botactivities",
   "version": "1.0.0",
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e684f95 (Addint eslint and prettier)
   "description": "Project using Apollo Server and coding with Typescript.",
   "main": "index.js",
   "scripts": {
@@ -13,14 +16,20 @@
   "main": "index.js",
   "scripts": {
     "compile": "tsc",
+<<<<<<< HEAD
     "start": "npm run compile && node ./dist/index.js"
 >>>>>>> b1b5838 (Inicial setup)
+=======
+    "start": "npm run compile && node ./dist/index.js",
+    "dev": "tsx watch src/index.ts"
+>>>>>>> c8f025b (Working Apollo)
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "dependencies": {
+<<<<<<< HEAD
 <<<<<<< HEAD
     "@apollo/server": "4.11.0",
     "graphql": "16.9.0"
@@ -42,7 +51,24 @@
   },
   "devDependencies": {
     "@types/node": "^22.7.4",
+    "tsx": "^4.19.1",
     "typescript": "^5.6.2"
 >>>>>>> b1b5838 (Inicial setup)
+=======
+    "@apollo/server": "4.11.0",
+    "graphql": "16.9.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.11.1",
+    "@types/node": "22.7.4",
+    "eslint": "9.11.1",
+    "eslint-config-prettier": "9.1.0",
+    "eslint-plugin-prettier": "5.2.1",
+    "globals": "15.10.0",
+    "prettier": "3.3.3",
+    "tsx": "4.19.1",
+    "typescript": "5.6.2",
+    "typescript-eslint": "8.8.0"
+>>>>>>> e684f95 (Addint eslint and prettier)
   }
 }
