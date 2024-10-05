@@ -23,6 +23,15 @@ var rootValue = {
    
 var app = express();
 
+// Runs the GraphQL query and prints the response
+graphql({
+    schema,
+    source: "{hello, name}",	
+    rootValue
+}).then(response => {
+    console.log(response)
+});
+
 app.get("/", (_req, res) => {
     res.type("html")
     res.end(ruruHTML({ endpoint: "/graphql" }))
