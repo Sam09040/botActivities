@@ -1,15 +1,2 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 /node_modules
 /dist/
-=======
-node_modules/
->>>>>>> b1b5838 (Inicial setup)
-=======
-/node_modules
->>>>>>> c8f025b (Working Apollo)
-=======
-/node_modules
-/dist/
->>>>>>> e684f95 (Addint eslint and prettier)
