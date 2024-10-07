@@ -1,38 +1,39 @@
 {
-  "name": "setup",
+  "name": "botactivities",
   "version": "1.0.0",
-  "description": "Setting up GraphQL with express and GraphiQL",
-  "main": "server.js",
+  "description": "Project using Apollo Server and Prisma using TypeScript",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/feature/setup-graphql.git"
+    "compile": "tsc",
+    "start": "npm run compile && node ./dist/index.js",
+    "dev": "tsx watch src/index.ts"
   },
   "keywords": [
-    "graphql",
-    "express"
+    "apollo",
+    "prisma",
+    "ts"
   ],
   "author": "Sam",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/feature/setup-graphql/issues"
-  },
-  "homepage": "https://github.com/feature/setup-graphql#readme",
+  "type": "module",
   "dependencies": {
-    "express": "4.21.0",
-    "graphql": "16.9.0",
-    "graphql-http": "1.22.1",
-    "ruru": "2.0.0-beta.13"
+    "@apollo/server": "4.11.0",
+    "@prisma/client": "5.20.0",
+    "graphql": "16.9.0"
   },
   "devDependencies": {
     "@eslint/js": "9.11.1",
+    "@types/node": "22.7.4",
     "eslint": "9.11.1",
     "eslint-config-prettier": "9.1.0",
     "eslint-plugin-prettier": "5.2.1",
-    "globals": "15.9.0",
-    "prettier": "3.3.3"
+    "globals": "15.10.0",
+    "prettier": "3.3.3",
+    "prisma": "5.20.0",
+    "tsx": "4.19.1",
+    "typescript": "5.6.2",
+    "typescript-eslint": "8.8.0",
+    "@apollo/server": "4.11.0",
+    "graphql": "16.9.0"
   }
 }
