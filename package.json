@@ -8,10 +8,6 @@
     "start": "npm run compile && node ./dist/index.js",
     "dev": "tsx watch src/index.ts"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/feature/setup-database.git"
-  },
   "keywords": [
     "apollo",
     "prisma",
@@ -19,10 +15,6 @@
   ],
   "author": "Sam",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/feature/setup-database/issues"
-  },
-  "homepage": "https://github.com/feature/setup-database#readme",
   "type": "module",
   "dependencies": {
     "@apollo/server": "4.11.0",
