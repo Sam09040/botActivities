@@ -1,6 +1,7 @@
 type Query{
     test: String,
-    users: [User]
+    users: [User],
+    user(id: Int!): User
 }
 
 type Mutation{
@@ -11,7 +12,6 @@ type User{
     id: ID!
     name: String!
     email: String!
-    password: String!
     birthDate: String!
 }
 
