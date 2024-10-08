@@ -7,6 +7,14 @@ const typeDefs = gql(readFileSync("./src/schema.graphql", "utf8"));
 
 const prisma = new PrismaClient();
 
+const isPasswordValid = (password: string): boolean => {
+    const minLength = 6;
+    const hasLetter = /[a-zA-Z]/.test(password);
+    const hasDigit = /\d/.test(password);
+
+    return password.length >= minLength && hasLetter && hasDigit;
+};
+
 const resolvers = {
     Query: {
         test: () => "it's working!",
@@ -47,13 +55,15 @@ const resolvers = {
                 throw new Error("Email already exists!");
             }
 
-            const saltRounds = 10;
-            const hashPassword = await bcrypt.hash(password, saltRounds);
+            if(!isPasswordValid(password)){
+                throw new Error("Password must be at least 6 characters long, have a least one letter and one digit!")
+            }
+
             const newUser = await prisma.user.create({
                 data: {
                     name,
                     email,
-                    password: hashPassword,
+                    password: await bcrypt.hash(password, 10),
                     birthDate,
                 },
             });
