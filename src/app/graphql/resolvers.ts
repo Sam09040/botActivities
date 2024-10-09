@@ -1,9 +1,7 @@
-import { PrismaClient } from '@prisma/client';
-import { UserInput } from '../interfaces';
-const prisma = new PrismaClient();
+import { prisma } from '../client/client';
+import { UserInput } from '../../interfaces';
 import isPasswordValid from './password';
 import bcrypt from 'bcrypt';
-
 
 export const resolvers = {
   Query: {
