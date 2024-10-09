@@ -18,6 +18,7 @@ const isPasswordValid = (password: string): boolean => {
 const resolvers = {
   Query: {
     test: () => "it's working!",
+    hello: () => "hello!",
     users: async () => {
       const users = await prisma.user.findMany();
 
@@ -81,6 +82,8 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
 });
+
+export default server;
 
 server.listen().then(async ({ url }) => {
   console.log(url);
