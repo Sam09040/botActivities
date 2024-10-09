@@ -1,40 +1,17 @@
-import { ApolloServer, gql } from "apollo-server";
-import { User } from './interfaces';
-import { readFileSync } from "fs";
-const typeDefs = gql(readFileSync("./src/schema.graphql", "utf8"))
-
-const users: User[] = [];
-
-const resolvers = {
-    Query: {
-        test: () => "it's working!",
-        users: () => users.map(({ password, ...user }) => user),
-    },
-    Mutation: {
-        createUser: (_, { data }: { data: Omit<User, 'id'> }) => {
-            if(!data){
-                throw new Error("Data is missing!");
-            }
-            const newUser = {
-                id: Math.floor(Math.random() * 100),
-                ...data,
-            };
-            users.push(newUser);
-            return {
-                id: newUser.id,
-                name: newUser.name,
-                email: newUser.email,
-                birthDate: newUser.birthDate,
-            };
-        }
-    }
-};
+import { ApolloServer, gql } from 'apollo-server';
+import { readFileSync } from 'fs';
+const typeDefs = gql(readFileSync('./src/app/graphql/schema.graphql', 'utf8'));
+import { resolvers } from './app/graphql/resolvers.js';
+import 'dotenv/config';
 
 const server = new ApolloServer({
-    typeDefs,
-    resolvers,
+  typeDefs,
+  resolvers,
 });
 
-server.listen().then( async ({ url }) => {
-    console.log(url);
-});
+export default server;
+console.log(process.env.PORT);
+
+/* server.listen(process.env.PORT).then(async ({ url }) => {
+  console.log(url);
+}); */
