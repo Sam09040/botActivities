@@ -13,6 +13,7 @@ const isPasswordValid = (password: string): boolean => {
 
 export const resolvers = {
   Query: {
+    hello: () => "hello!",
     test: () => "it's working!",
     users: async () => {
       const users = await prisma.user.findMany();

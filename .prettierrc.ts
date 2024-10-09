@@ -1,4 +1,4 @@
-module.exports = {
+export const modules = {
     trailingComma: 'all',
     singleQuote: true,
     printWidth: 120,

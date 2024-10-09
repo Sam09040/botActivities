@@ -8,6 +8,8 @@ const server = new ApolloServer({
   resolvers,
 });
 
+export default server;
+
 server.listen().then(async ({ url }) => {
   console.log(url);
 });
