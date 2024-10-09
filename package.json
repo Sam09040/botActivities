@@ -7,8 +7,9 @@
     "compile": "tsc",
     "start": "npm run compile && node ./dist/index.js",
     "dev": "tsx watch src/index.ts",
-    "check": "npx eslint-config-prettier src/index.ts",
-    "eslint": "npx eslint ."
+    "check": "prettier --write src/**/*.ts",
+    "lint": "eslint src/**/*.ts",
+    "test": "mocha"
   },
   "keywords": [
     "apollo",
@@ -21,21 +22,28 @@
   "dependencies": {
     "@prisma/client": "5.20.0",
     "apollo-server": "3.13.0",
-    "bcrypt": "5.1.1",
     "fs": "0.0.1-security",
     "graphql": "16.9.0"
   },
   "devDependencies": {
     "@eslint/js": "9.11.1",
+    "@types/bcrypt": "5.0.2",
+    "@types/chai": "5.0.0",
+    "@types/mocha": "10.0.9",
     "@types/node": "22.7.4",
     "apollo-server": "3.13.0",
+    "axios": "1.7.7",
+    "bcrypt": "5.1.1",
+    "chai": "5.1.1",
     "eslint": "9.11.1",
     "eslint-config-prettier": "9.1.0",
     "eslint-plugin-prettier": "5.2.1",
     "globals": "15.10.0",
     "graphql": "16.9.0",
+    "mocha": "10.7.3",
     "prettier": "3.3.3",
     "prisma": "5.20.0",
+    "ts-node": "10.9.2",
     "tsx": "4.19.1",
     "typescript": "5.6.2",
     "typescript-eslint": "8.8.0"
