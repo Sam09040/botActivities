@@ -47,7 +47,7 @@ const resolvers = {
 
             const { name, email, password, birthDate } = data;
 
-            const existingEmail = await prisma.user.findFirst({
+            const existingEmail = await prisma.user.findUnique({
                 where: { email: email },
             });
 
