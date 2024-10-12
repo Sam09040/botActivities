@@ -1,17 +1,19 @@
+/* eslint-disable no-undef */
 import { expect } from 'chai';
 import axios from 'axios';
 import server from '../dist/index.js';
-let serverInstance = server;
+let serverInstance;
 
 before(async () => {
     if(!server.listen()){
         serverInstance = await server.listen({ port: 4000 });
-        console.log(serverInstance);        
+        console.log(serverInstance.url);        
     }
     console.log('Server started on port 4000');
 });
 
 after(async () => {
+    serverInstance = server;
     if(serverInstance){
         await serverInstance.stop();   
         serverInstance = null;
