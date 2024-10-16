@@ -9,11 +9,10 @@ import 'dotenv/config'
 describe('createUser mutation', () => {
     let serverInstance;
     const port = process.env.PORT;
-    console.log(port);
     
     before(async () => {
         serverInstance = server;
-        if(!server){
+        if(!server.listen()){
             server.listen(port).then( async ({ url }) => {
                 console.log(url);
             })       
@@ -28,7 +27,7 @@ describe('createUser mutation', () => {
     
     afterEach(async () => {
         await prisma.user.deleteMany();
-    })
+    });
     
     after(async () => {
         serverInstance = server;
@@ -65,7 +64,7 @@ describe('createUser mutation', () => {
         };
 
         console.log("sending query...");
-        const response = await axios.post(`http://localhost:/`, {
+        const response = await axios.post(`http://localhost:${port}/`, {
             query: createUser,
             variables,
         });
