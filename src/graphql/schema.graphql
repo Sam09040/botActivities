@@ -1,5 +1,4 @@
 type Query{
-    test: String,
     users: [User],
     user(id: Int!): User,
     hello: String
