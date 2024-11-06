@@ -1,7 +1,7 @@
 import { ApolloServer, gql } from 'apollo-server';
 import { readFileSync } from 'fs';
 const typeDefs = gql(readFileSync('./src/graphql/schema.graphql', 'utf8'));
-import { resolvers } from './graphql/resolvers.js';
+import resolvers from './graphql/resolvers';
 
 const server = new ApolloServer({
   typeDefs,
@@ -10,6 +10,6 @@ const server = new ApolloServer({
 
 export default server;
 
-server.listen().then(async ({ url }) => {
+/* server.listen().then(async ({ url }) => {
   console.log(url);
-});
+}); */

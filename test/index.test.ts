@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 import { expect } from 'chai';
 import axios from 'axios';
-import server from '../dist/index.js';
+import server from '../src/index';
 let serverInstance;
 
 before(async () => {
