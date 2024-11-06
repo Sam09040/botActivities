@@ -1,9 +1,8 @@
 /* eslint-disable no-undef */
 import { expect } from 'chai';
 import axios from 'axios';
-import server from '../dist/index.js';
-import { PrismaClient } from '@prisma/client';
-let prisma = new PrismaClient();
+import server from '../src/app/graphql/server';
+import prisma from '../src/app/client/client';
 import 'dotenv/config'
 
 describe('createUser mutation', () => {
@@ -84,7 +83,7 @@ describe('createUser mutation', () => {
         });
 
         expect(userInDb).to.not.equal(null);
-        expect(userInDb.name).to.equal('Sam');
-        console.log(userInDb.name);
+        expect(userInDb?.name).to.equal('Sam');
+        console.log(userInDb?.name);
     });
 });
