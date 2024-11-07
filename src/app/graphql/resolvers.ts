@@ -20,6 +20,17 @@ export const resolvers = {
       return users;
     },
     user: async (_: unknown, { id }: { id: number }) => {
+        if(id == 0){
+        throw new CustomError(
+            '400',
+            'Invalid request!',
+            {
+              field: 'id',
+              reason: 'The id needs to be greater than 0!',
+            }
+        );
+      }
+
       const user = prisma.user.findUnique({
         where: { id: id },
       });
