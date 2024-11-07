@@ -8,8 +8,8 @@
     "dev": "tsx watch src/index.ts",
     "check": "prettier --write src/**/*.ts",
     "lint": "eslint src/**/*.ts",
-    "start_test": "npx dotenvx run --env-file=test.env -- npm run start",
-    "test": "TSIMP_DIAG=error npx dotenvx run --env-file=.env.test -- mocha --import=tsimp/import test/index.test.ts"
+    "start_test": "npx dotenvx run --env-file=.env.test -- npm run start",
+    "test": "TSIMP_DIAG=error npx dotenvx run --env-file=.env.test -- mocha --import=tsimp/import run-script.ts"
   },
   "keywords": [
     "apollo",
@@ -26,6 +26,7 @@
     "graphql": "16.9.0"
   },
   "devDependencies": {
+    "@apollo/server": "4.11.2",
     "@dotenvx/dotenvx": "1.19.2",
     "@eslint/js": "9.11.1",
     "@types/bcrypt": "5.0.2",
