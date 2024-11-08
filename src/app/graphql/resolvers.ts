@@ -107,7 +107,7 @@ export const resolvers = {
         });
       }
 
-      const { email, password } = data;
+      const { email, password, rememberMe } = data;
 
       if (!email || !password) {
         throw new CustomError('400', 'Invalid input!', {
@@ -132,8 +132,14 @@ export const resolvers = {
           reason: 'The provided password does not match.',
         });
       }
-
-      const token = jwt.sign({ userId: user.id, email: user.email }, jwtSecret, { expiresIn: '1h' });
+      let token = null;
+      if (rememberMe) {
+        token = jwt.sign({ userId: user.id }, jwtSecret, { expiresIn: '1w' });
+        console.log('Remembering');
+      } else {
+        token = jwt.sign({ userId: user.id }, jwtSecret, { expiresIn: '1h' });
+        console.log("Won't remember");
+      }
 
       return {
         user: {

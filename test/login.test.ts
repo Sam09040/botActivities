@@ -66,6 +66,7 @@ describe('login mutation', () => {
       data: {
         email: 'sam@invalid.com',
         password: 'password123',
+        rememberMe: true,
       },
     };
 
@@ -102,6 +103,7 @@ describe('login mutation', () => {
       data: {
         email: 'sam@example.com',
         password: 'password123',
+        rememberMe: true,
       },
     };
 
@@ -138,6 +140,7 @@ describe('login mutation', () => {
       data: {
         email: 'sam@example.com',
         password: 'Sam123',
+        rememberMe: false,
       },
     };
 
@@ -149,6 +152,6 @@ describe('login mutation', () => {
     expect(response).to.have.property('status', 200);
     expect(login).to.have.property('token').that.is.a('string');
     expect(login.user.name).to.equal('Sam');
-    expect(login.user.birthDate).to.equal('2004-04-09');
+    expect(login.user.birthDate).to.equal('09-04-2004');
   });
 });
