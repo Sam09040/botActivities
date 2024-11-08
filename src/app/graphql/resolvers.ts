@@ -3,6 +3,14 @@ import { UserInput } from '../interfaces';
 import isPasswordValid from './password';
 import bcrypt from 'bcrypt';
 import { CustomError } from '../errors/CustomError';
+import jwt from 'jsonwebtoken';
+import 'dotenv/config';
+const jwtSecret = process.env.JWT_SECRET ?? '';
+
+const comparePassword = async (password: string, hashedPassword: string) => {
+  const isMatch = await bcrypt.compare(password, hashedPassword);
+  return isMatch;
+};
 
 export const resolvers = {
   Query: {
@@ -20,15 +28,11 @@ export const resolvers = {
       return users;
     },
     user: async (_: unknown, { id }: { id: number }) => {
-        if(id == 0){
-        throw new CustomError(
-            '400',
-            'Invalid request!',
-            {
-              field: 'id',
-              reason: 'The id needs to be greater than 0!',
-            }
-        );
+      if (id == 0) {
+        throw new CustomError('400', 'Invalid request!', {
+          field: 'id',
+          reason: 'The id needs to be greater than 0!',
+        });
       }
 
       const user = prisma.user.findUnique({
@@ -93,6 +97,52 @@ export const resolvers = {
         name: newUser.name,
         email: newUser.email,
         birthDate: newUser.birthDate,
+      };
+    },
+    login: async (_: unknown, { data }: LoginInput) => {
+      if (!data) {
+        throw new CustomError('400', 'Data is missing!', {
+          field: 'data',
+          reason: 'You need to input data!',
+        });
+      }
+
+      const { email, password } = data;
+
+      if (!email || !password) {
+        throw new CustomError('400', 'Invalid input!', {
+          field: 'data',
+          reason: 'Email and password are required!',
+        });
+      }
+
+      const user = await prisma.user.findUnique({ where: { email: email } });
+
+      if (!user) {
+        throw new CustomError('404', 'User not found!', {
+          field: 'email',
+          reason: 'The email you provided does not exist.',
+        });
+      }
+
+      const isValid = await comparePassword(password, user.password);
+      if (!isValid) {
+        throw new CustomError('400', 'Wrong password.', {
+          field: 'password',
+          reason: 'The provided password does not match.',
+        });
+      }
+
+      const token = jwt.sign({ userId: user.id, email: user.email }, jwtSecret, { expiresIn: '1h' });
+
+      return {
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          birthDate: user.birthDate,
+        },
+        token,
       };
     },
   },
