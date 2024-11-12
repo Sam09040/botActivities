@@ -1,11 +1,12 @@
 import prisma from '../client/client';
-import { UserInput } from '../interfaces';
+import { LoginInput, UserInput } from '../interfaces';
 import isPasswordValid from './password';
 import bcrypt from 'bcrypt';
 import { CustomError } from '../errors/CustomError';
 import jwt from 'jsonwebtoken';
 import 'dotenv/config';
-const jwtSecret = process.env.JWT_SECRET ?? '';
+import { AuthenticationError } from 'apollo-server';
+const JWT_SECRET = process.env.JWT_SECRET ?? '';
 
 const comparePassword = async (password: string, hashedPassword: string) => {
   const isMatch = await bcrypt.compare(password, hashedPassword);
@@ -49,15 +50,29 @@ export const resolvers = {
     },
   },
   Mutation: {
-    createUser: async (_: unknown, { data }: UserInput) => {
-      if (!data) {
-        throw new CustomError('400', 'Data is missing!', {
-          field: 'data',
-          reason: 'You need to input data!',
+    createUser: async (_: unknown, { data }: UserInput, context: any) => {
+      const token = context.token;
+      const { name, email, password, birthDate } = data;
+
+      if (!token) {
+        throw new AuthenticationError('Token is required for this operation!', {
+          http_status: '400',
+          field: 'authorization',
+          reason: 'A valid token must be provided.',
         });
       }
 
-      const { name, email, password, birthDate } = data;
+      try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        console.log(decoded);
+      } catch (error) {
+        console.log(error.message);
+        throw new AuthenticationError('Token is invalid!', {
+          http_status: '401',
+          field: 'authorization',
+          reason: 'A valid token must be provided.',
+        });
+      }
 
       if (!name || !email || !password || !birthDate) {
         throw new CustomError('400', 'Invalid input!', {
@@ -100,13 +115,6 @@ export const resolvers = {
       };
     },
     login: async (_: unknown, { data }: LoginInput) => {
-      if (!data) {
-        throw new CustomError('400', 'Data is missing!', {
-          field: 'data',
-          reason: 'You need to input data!',
-        });
-      }
-
       const { email, password, rememberMe } = data;
 
       if (!email || !password) {
@@ -134,11 +142,9 @@ export const resolvers = {
       }
       let token = null;
       if (rememberMe) {
-        token = jwt.sign({ userId: user.id }, jwtSecret, { expiresIn: '1w' });
-        console.log('Remembering');
+        token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '1w' });
       } else {
-        token = jwt.sign({ userId: user.id }, jwtSecret, { expiresIn: '1h' });
-        console.log("Won't remember");
+        token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '1h' });
       }
 
       return {

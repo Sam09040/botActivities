@@ -154,4 +154,72 @@ describe('login mutation', () => {
     expect(login.user.name).to.equal('Sam');
     expect(login.user.birthDate).to.equal('09-04-2004');
   });
+
+  it('should return an error for missing token', async () => {
+    const mutation = `
+            mutation createUser($data: UserInput!){
+                createUser(data: $data) {
+                    id,
+                    name,
+                    email,
+                    birthDate
+                }
+            }
+        `;
+
+    const variables = {
+      data: {
+        name: 'Jeff',
+        email: 'email@example.com',
+        password: 'password123',
+        birthDate: '09-04-2004',
+      },
+    };
+
+    console.log('Sending query...');
+    const response = await axios.post(url, { query: mutation, variables });
+    const data = response.data;
+    expect(data).to.have.property('errors');
+    expect(data.errors[0].message).to.equal('Token is required for this operation!');
+    expect(data.errors[0].extensions.code).to.equal('UNAUTHENTICATED');
+    expect(data.errors[0].extensions.field).to.equal('authorization');
+    expect(data.errors[0].extensions.reason).to.equal('A valid token must be provided.');
+    expect(data.errors[0].extensions.http_status).to.equal('400');
+  });
+
+  it('should return an error for invalid token', async () => {
+    const headers = {
+      'Content-Type': 'application/json',
+      Authorization: 'none',
+    };
+    const mutation = `
+            mutation createUser($data: UserInput!){
+                createUser(data: $data) {
+                    id,
+                    name,
+                    email,
+                    birthDate
+                }
+            }
+        `;
+
+    const variables = {
+      data: {
+        name: 'Jeff',
+        email: 'email@example.com',
+        password: 'password123',
+        birthDate: '09-04-2004',
+      },
+    };
+
+    console.log('Sending query...');
+    const response = await axios.post(url, { query: mutation, variables }, { headers });
+    const data = response.data;
+    expect(data).to.have.property('errors');
+    expect(data.errors[0].message).to.equal('Token is invalid!');
+    expect(data.errors[0].extensions.code).to.equal('UNAUTHENTICATED');
+    expect(data.errors[0].extensions.field).to.equal('authorization');
+    expect(data.errors[0].extensions.reason).to.equal('A valid token must be provided.');
+    expect(data.errors[0].extensions.http_status).to.equal('401');
+  });
 });

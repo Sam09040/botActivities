@@ -4,7 +4,7 @@
   "description": "Project using Apollo Server and Prisma using TypeScript",
   "main": "index.js",
   "scripts": {
-    "start": "node --import=tsimp/import src/index.ts",
+    "start": "TSIMP_DIAG=error node --import=tsimp/import src/index.ts",
     "dev": "tsx watch src/index.ts",
     "check": "prettier --write src/**/*.ts test/**/*.ts && npm run lint",
     "lint": "eslint src/**/*.ts test/**/*.ts",
@@ -27,6 +27,7 @@
     "graphql": "16.9.0"
   },
   "devDependencies": {
+    "@apollo/client": "3.11.9",
     "@apollo/server": "4.11.2",
     "@dotenvx/dotenvx": "1.19.2",
     "@eslint/js": "9.11.1",
