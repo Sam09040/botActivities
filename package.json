@@ -4,14 +4,12 @@
   "description": "Project using Apollo Server and Prisma using TypeScript",
   "main": "index.js",
   "scripts": {
-    "compile": "tsc",
-    "start": "npm run compile && node ./dist/index.js",
-    "tstart": "TSIMP_DIAG=error node --import=tsimp/import src/index.ts",
+    "start": "node --import=tsimp/import src/index.ts",
     "dev": "tsx watch src/index.ts",
     "check": "prettier --write src/**/*.ts",
     "lint": "eslint src/**/*.ts",
-    "start_test": "npx dotenvx run --env-file=test.env -- npm run tstart",
-    "test": "TSIMP_DIAG=error npx dotenvx run --env-file=test.env -- mocha --import=tsimp/import test/index.test.ts"
+    "start_test": "npx dotenvx run --env-file=test.env -- npm run start",
+    "test": "TSIMP_DIAG=error npx dotenvx run --env-file=.env.test -- mocha --import=tsimp/import test/index.test.ts"
   },
   "keywords": [
     "apollo",

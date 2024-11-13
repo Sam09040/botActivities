@@ -1,26 +1,26 @@
-/* eslint-disable no-undef */
 import { expect } from 'chai';
 import axios from 'axios';
 import server from '../src/index';
-import { PrismaClient } from '@prisma/client';
-let prisma = new PrismaClient();
+import { prisma } from '../src/app/client/client'
 import 'dotenv/config'
 
 describe('createUser mutation', () => {
-    let serverInstance;
     const port = process.env.PORT;
     
     before(async () => {
-        serverInstance = server;
-        if(!server.listen()){
-            server.listen(port).then( async ({ url }) => {
-                console.log(url);
-            })       
-        }
-        if(!prisma.$connect()){
-            await prisma.$connect();
-            console.log(`Connected to database testdb`);
-        }
+      try {
+        await server.listen(port).then(async ({ url }) => {
+          console.log(url);
+        });
+      } catch (error) {
+        console.log(error);
+      }
+  
+      try {
+        await prisma.$connect();
+      } catch (error) {
+        console.log(error);
+      }
         console.log(`Connected to database testdb`);
         console.log(`Server started on port ${port}`);
     });
@@ -30,10 +30,8 @@ describe('createUser mutation', () => {
     });
     
     after(async () => {
-        serverInstance = server;
-        if(serverInstance){
-            await serverInstance.stop();
-            serverInstance = null;
+        if(server){
+            await server.stop();
             console.log('Server stopped');
         }
         if(prisma) {
