@@ -9,15 +9,18 @@ describe('createUser mutation', () => {
   const port = process.env.PORT;
 
   before(async () => {
-    serverInstance = server;
-    if (!server.listen()) {
-      server.listen(port).then(async ({ url }) => {
+    try {
+      await server.listen(port).then(async ({ url }) => {
         console.log(url);
       });
+    } catch (error) {
+      console.log(error.message);
     }
-    if (!prisma.$connect()) {
+
+    try {
       await prisma.$connect();
-      console.log(`Connected to database testdb`);
+    } catch (error) {
+      console.log(error);
     }
     console.log(`Connected to database testdb`);
     console.log(`Server started on port ${port}`);

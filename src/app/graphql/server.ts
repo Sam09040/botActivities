@@ -23,8 +23,11 @@ const server = new ApolloServer({
         extensions,
       };
     }
-
     return err;
+  },
+  context: async ({ req }) => {
+    const token = req.headers.authorization ?? null;
+    return { token };
   },
 });
 

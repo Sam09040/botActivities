@@ -1,8 +1,7 @@
 import { expect } from 'chai';
 import axios from 'axios';
 import server from '../src/app/graphql/server';
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
+import { prisma } from '../src/app/client/client';
 import 'dotenv/config';
 import bcrypt from 'bcrypt';
 
@@ -10,15 +9,18 @@ describe('login mutation', () => {
   const port = process.env.PORT;
   const url = `http://localhost:${port}/`;
   before(async () => {
-    if (!server.listen()) {
+    try {
       await server.listen(port).then(async ({ url }) => {
         console.log(url);
       });
-      console.log(`listening on ${url}`);
+    } catch (error) {
+      console.log(error.message);
     }
-    if (!prisma.$connect()) {
+
+    try {
       await prisma.$connect();
-      console.log('connected to testdb');
+    } catch (error) {
+      console.log(error);
     }
     console.log(`listening on ${url}`);
     console.log('connected to testdb');
