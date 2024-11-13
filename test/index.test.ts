@@ -1,22 +1,22 @@
-/* eslint-disable no-undef */
 import { expect } from 'chai';
 import axios from 'axios';
-import server from '../src/index';
-let serverInstance;
+import server from '../src/graphql/server';
 
 before(async () => {
-    if(!server.listen()){
-        serverInstance = await server.listen({ port: 4000 });
-        console.log(serverInstance.url);        
+  try {
+    await server.listen().then(async ({ url }) => {
+      console.log(url);
+    });
+  } catch (error) {
+    if(error instanceof Error) {
+      console.error(`Error starting server: ${error.message}`);
     }
-    console.log('Server started on port 4000');
+  }
 });
 
 after(async () => {
-    serverInstance = server;
-    if(serverInstance){
-        await serverInstance.stop();   
-        serverInstance = null;
+    if(server){
+        await server.stop();   
         console.log('Server stopped');
     }
 });
