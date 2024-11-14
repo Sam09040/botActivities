@@ -1,5 +1,5 @@
 import { prisma } from '../client/client';
-import { UserInput } from '../../interfaces';
+import { UserInput } from '../interfaces';
 import isPasswordValid from './password';
 import bcrypt from 'bcrypt';
 
@@ -10,7 +10,7 @@ export const resolvers = {
       const users = await prisma.user.findMany();
 
       if (!users) {
-        return null;
+        return [];
       }
 
       return users;

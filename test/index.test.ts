@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import axios from 'axios';
-import server from '../src/index';
+import server from '../src/app/graphql/server';
 import { prisma } from '../src/app/client/client'
 import 'dotenv/config'
 
@@ -18,11 +18,10 @@ describe('createUser mutation', () => {
   
       try {
         await prisma.$connect();
+        console.log('Connected to testdb');
       } catch (error) {
         console.log(error);
       }
-        console.log(`Connected to database testdb`);
-        console.log(`Server started on port ${port}`);
     });
     
     afterEach(async () => {
@@ -67,9 +66,6 @@ describe('createUser mutation', () => {
             variables,
         });
         const { data } = response.data;
-        console.log('response received: ', data);
-
-        
 
         expect(data).to.have.property('createUser');
         expect(data.createUser).to.have.property('id');
@@ -83,6 +79,5 @@ describe('createUser mutation', () => {
 
         expect(userInDb).to.not.equal(null);
         expect(userInDb?.name).to.equal('Sam');
-        console.log(userInDb?.name);
     });
 });
