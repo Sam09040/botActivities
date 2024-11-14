@@ -3,3 +3,5 @@
 /db
 *.env*
 /prisma/migrations
+.vscode
+.tsimp

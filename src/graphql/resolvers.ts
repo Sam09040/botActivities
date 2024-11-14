@@ -1,19 +1,13 @@
 import { PrismaClient } from '@prisma/client';
 import { UserInput } from '../interfaces';
-import bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
+import isPasswordValid from './password';
+import bcrypt from 'bcrypt';
 
-const isPasswordValid = (password: string): boolean => {
-  const minLength = 6;
-  const hasLetter = /[a-zA-Z]/.test(password);
-  const hasDigit = /\d/.test(password);
-
-  return password.length >= minLength && hasLetter && hasDigit;
-};
 
 export const resolvers = {
   Query: {
-    test: () => "it's working!",
+    hello: () => 'hello!',
     users: async () => {
       const users = await prisma.user.findMany();
 
