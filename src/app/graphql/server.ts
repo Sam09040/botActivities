@@ -8,7 +8,7 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
   formatError: (err) => {
-    if(err.originalError instanceof CustomError) {
+    if (err.originalError instanceof CustomError) {
       const { code, message, additionalInfo } = err.originalError;
       return {
         code,

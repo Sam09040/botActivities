@@ -9,8 +9,9 @@
     "check": "prettier --write src/**/*.ts test/**/*.ts && npm run lint",
     "lint": "eslint src/**/*.ts test/**/*.ts",
     "start_test": "npx dotenvx run --env-file=.env.test -- npm run tstart",
-    "test": "TSIMP_DIAG=error npx dotenvx run --env-file=.env.test -- npm run reset && mocha --import=tsimp/import test/*.ts",
-    "reset": "npx prisma db push --force-reset"
+    "test": "TSIMP_DIAG=error npx dotenvx run --env-file=.env.test -- mocha --import=tsimp/import test/*.ts",
+    "reset": "npx prisma db push --force-reset",
+    "reset_test": "npx dotenvx run --env-file=.env.test -- npx prisma db push --force-reset"
   },
   "keywords": [
     "apollo",

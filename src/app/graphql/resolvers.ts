@@ -28,11 +28,29 @@ export const resolvers = {
 
       return users;
     },
-    user: async (_: unknown, { id }: { id: number }) => {
-      if (id == 0) {
+    user: async (_: unknown, { id }: { id: number }, { token }: any) => {
+      if (!id) {
         throw new CustomError('400', 'Invalid request!', {
           field: 'id',
           reason: 'The id needs to be greater than 0!',
+        });
+      }
+
+      if (!token) {
+        throw new AuthenticationError('Token is required for this operation!', {
+          http_status: '400',
+          field: 'authorization',
+          reason: 'A valid token must be provided.',
+        });
+      }
+
+      try {
+        jwt.verify(token, JWT_SECRET);
+      } catch (error) {
+        throw new AuthenticationError('Token is invalid!', {
+          http_status: '401',
+          field: 'authorization',
+          reason: 'A valid token must be provided.',
         });
       }
 
@@ -50,8 +68,7 @@ export const resolvers = {
     },
   },
   Mutation: {
-    createUser: async (_: unknown, { data }: UserInput, context: any) => {
-      const token = context.token;
+    createUser: async (_: unknown, { data }: UserInput, { token }: any) => {
       const { name, email, password, birthDate } = data;
 
       if (!token) {
@@ -63,10 +80,8 @@ export const resolvers = {
       }
 
       try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-        console.log(decoded);
+        jwt.verify(token, JWT_SECRET);
       } catch (error) {
-        console.log(error.message);
         throw new AuthenticationError('Token is invalid!', {
           http_status: '401',
           field: 'authorization',

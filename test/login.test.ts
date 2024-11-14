@@ -72,7 +72,6 @@ describe('login mutation', () => {
       },
     };
 
-    console.log('Sending query...');
     try {
       await axios.post(url, { query: mutation, variables });
     } catch (err) {
@@ -109,7 +108,6 @@ describe('login mutation', () => {
       },
     };
 
-    console.log('Sending query...');
     try {
       await axios.post(url, { query: mutation, variables });
     } catch (err) {
@@ -146,10 +144,8 @@ describe('login mutation', () => {
       },
     };
 
-    console.log('Sending query...');
     const response = await axios.post(url, { query: mutation, variables });
     const login = response.data.data.login;
-    console.log('response received: ', login);
 
     expect(response).to.have.property('status', 200);
     expect(login).to.have.property('token').that.is.a('string');
@@ -178,7 +174,6 @@ describe('login mutation', () => {
       },
     };
 
-    console.log('Sending query...');
     const response = await axios.post(url, { query: mutation, variables });
     const data = response.data;
     expect(data).to.have.property('errors');
@@ -214,7 +209,6 @@ describe('login mutation', () => {
       },
     };
 
-    console.log('Sending query...');
     const response = await axios.post(url, { query: mutation, variables }, { headers });
     const data = response.data;
     expect(data).to.have.property('errors');

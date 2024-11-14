@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import axios from 'axios';
 import server from '../src/app/graphql/server';
 import prisma from '../src/app/client/client';
-import 'dotenv/config'
+import 'dotenv/config';
 
 describe('createUser mutation', () => {
   let serverInstance;
