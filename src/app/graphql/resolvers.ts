@@ -9,7 +9,7 @@ export const resolvers = {
     users: async () => {
       const users = await prisma.user.findMany();
 
-      if (!users) {
+      if (!users.length) {
         return [];
       }
 
