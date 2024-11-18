@@ -4,13 +4,12 @@
   "description": "Project using Apollo Server and Prisma using TypeScript",
   "main": "index.js",
   "scripts": {
-    "compile": "tsc",
-    "start": "npm run compile && node ./dist/index.js",
-    "tstart": "TSIMP_DIAG=error node --import=tsimp/import src/index.ts",
+    "start": "node --import=tsimp/import src/index.ts",
     "dev": "tsx watch src/index.ts",
     "check": "prettier --write src/**/*.ts",
     "lint": "eslint src/**/*.ts",
-    "test": "mocha --import=tsimp/import test/**.test.ts"
+    "start_test": "npx dotenvx run --env-file=test.env -- npm run start",
+    "test": "TSIMP_DIAG=error npx dotenvx run --env-file=.env.test -- mocha --import=tsimp/import test/index.test.ts"
   },
   "keywords": [
     "apollo",
@@ -27,6 +26,7 @@
     "graphql": "16.9.0"
   },
   "devDependencies": {
+    "@dotenvx/dotenvx": "1.19.2",
     "@eslint/js": "9.11.1",
     "@types/bcrypt": "5.0.2",
     "@types/chai": "5.0.0",
@@ -36,6 +36,7 @@
     "axios": "1.7.7",
     "bcrypt": "5.1.1",
     "chai": "5.1.1",
+    "dotenv": "16.4.5",
     "eslint": "9.11.1",
     "eslint-config-prettier": "9.1.0",
     "eslint-plugin-prettier": "5.2.1",
@@ -43,7 +44,7 @@
     "graphql": "16.9.0",
     "mocha": "10.7.3",
     "prettier": "3.3.3",
-    "prisma": "5.20.0",
+    "prisma": "5.21.0",
     "ts-node": "10.9.2",
     "tsimp": "2.0.12",
     "tsx": "4.19.1",

@@ -1,9 +1,7 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../client/client';
 import { UserInput } from '../interfaces';
-const prisma = new PrismaClient();
 import isPasswordValid from './password';
 import bcrypt from 'bcrypt';
-
 
 export const resolvers = {
   Query: {
@@ -11,8 +9,8 @@ export const resolvers = {
     users: async () => {
       const users = await prisma.user.findMany();
 
-      if (!users) {
-        return null;
+      if (!users.length) {
+        return [];
       }
 
       return users;
