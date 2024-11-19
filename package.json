@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node --import=tsimp/import src/index.ts",
     "dev": "tsx watch src/index.ts",
-    "check": "prettier --write src/**/*.ts",
+    "check": "prettier --write src/**/*.ts test/*.ts",
     "lint": "eslint src/**/*.ts",
     "start_test": "npx dotenvx run --env-file=.env.test -- npm run start",
     "test": "TSIMP_DIAG=error npx dotenvx run --env-file=.env.test -- mocha --import=tsimp/import test/*.ts"

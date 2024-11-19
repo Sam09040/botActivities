@@ -23,7 +23,7 @@ export const resolvers = {
       const user = prisma.user.findUnique({
         where: { id: id },
       });
-      if (user == null) {
+      if (user === null) {
         throw new CustomError('404', 'User not found!', {
           field: 'id',
           reason: 'The provided id does not exist.',

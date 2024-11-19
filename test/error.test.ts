@@ -7,7 +7,7 @@ import bcrypt from 'bcrypt';
 
 describe.only('createUser mutation', () => {
   const port = process.env.PORT;
-  const url = 'http://localhost:4000/'
+  const url = 'http://localhost:4000/';
   before(async () => {
     try {
       await server.listen(port).then(async ({ url }) => {
@@ -29,8 +29,8 @@ describe.only('createUser mutation', () => {
         name: 'Sam',
         email: 'sam@example.com',
         password: await bcrypt.hash('Sam123', 10),
-        birthDate: '2004-04-09'
-      }
+        birthDate: '2004-04-09',
+      },
     });
   });
 
@@ -45,7 +45,7 @@ describe.only('createUser mutation', () => {
       await prisma.$disconnect();
       console.log('Database testdb disconnected');
     }
-  })
+  });
 
   it('should return an error for existing email', async () => {
     const mutation = `
@@ -64,20 +64,20 @@ describe.only('createUser mutation', () => {
         name: 'Sam',
         email: 'sam@example.com',
         password: 'sam123',
-        birthDate: '2004-04-09'
-      }
+        birthDate: '2004-04-09',
+      },
     };
 
     console.log('Sending query...');
     try {
-      await axios.post(url, { query: mutation, variables, });
+      await axios.post(url, { query: mutation, variables });
     } catch (error) {
       const graphqlError = error.response.data.errors[0];
       expect(graphqlError.message).to.equal('Email already exists!');
       expect(graphqlError.extensions.code).to.equal('400');
       expect(graphqlError.extensions.additionalInfo).to.deep.equal({
         field: 'email',
-        reason: 'The email you provided is already in use. Please choose a different email address.'
+        reason: 'The email you provided is already in use. Please choose a different email address.',
       });
     }
   });
@@ -99,20 +99,20 @@ describe.only('createUser mutation', () => {
         name: 'Ben',
         email: 'ben@gmail.com',
         password: '123',
-        birthDate: '2005-10-20'
-      }
-    }
+        birthDate: '2005-10-20',
+      },
+    };
 
     try {
       await axios.post(url, { query: mutation, variables });
     } catch (error) {
       const graphqlError = error.response.data.errors[0];
-      expect(graphqlError.message).to.equal('Password doesn\'t fit requirements!');
+      expect(graphqlError.message).to.equal(`Password doesn't fit requirements!`);
       expect(graphqlError.extensions.code).to.equal('401');
       expect(graphqlError.extensions.additionalInfo).to.deep.equal({
         field: 'password',
-        reason: 'Password must be at least 6 characters long, have a least one letter and one digit!'
-      })
+        reason: 'Password must be at least 6 characters long, have a least one letter and one digit!',
+      });
     }
   });
 
@@ -133,9 +133,9 @@ describe.only('createUser mutation', () => {
         name: '',
         email: 'ben@gmail.com',
         password: '123',
-        birthDate: '2005-10-20'
-      }
-    }
+        birthDate: '2005-10-20',
+      },
+    };
 
     try {
       await axios.post(url, { query: mutation, variables });
@@ -145,8 +145,8 @@ describe.only('createUser mutation', () => {
       expect(graphqlError.extensions.code).to.equal('400');
       expect(graphqlError.extensions.additionalInfo).to.deep.equal({
         field: 'data',
-        reason: 'Name, email, password and birthDate are required!'
-      })
+        reason: 'Name, email, password and birthDate are required!',
+      });
     }
   });
 
@@ -170,8 +170,8 @@ describe.only('createUser mutation', () => {
       expect(graphqlError.extensions.code).to.equal('404');
       expect(graphqlError.extensions.additionalInfo).to.deep.equal({
         field: 'User',
-        reason: 'There are no users.'
-      })
+        reason: 'There are no users.',
+      });
     }
   });
-})
+});
