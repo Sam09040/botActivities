@@ -9,7 +9,7 @@
     "check": "prettier --write src/**/*.ts",
     "lint": "eslint src/**/*.ts",
     "start_test": "npx dotenvx run --env-file=.env.test -- npm run start",
-    "test": "TSIMP_DIAG=error npx dotenvx run --env-file=.env.test -- mocha --import=tsimp/import run-script.ts"
+    "test": "TSIMP_DIAG=error npx dotenvx run --env-file=.env.test -- mocha --import=tsimp/import test/*.ts"
   },
   "keywords": [
     "apollo",

@@ -1,11 +1,11 @@
 export class CustomError extends Error {
-    code: string;
-    additionalInfo?: Record<string, any>;
+  code: string;
+  additionalInfo?: Record<string, unknown>;
 
-    constructor(code: string, message: string, additionalInfo?:Record<string, any>) {
-        super(message);
-        this.code = code;
-        this.additionalInfo = additionalInfo;
-        Object.setPrototypeOf(this, CustomError.prototype);
-    }
+  constructor(code: string, message: string, additionalInfo?: Record<string, unknown>) {
+    super(message);
+    this.code = code;
+    this.additionalInfo = additionalInfo;
+    Object.setPrototypeOf(this, CustomError.prototype);
+  }
 }
