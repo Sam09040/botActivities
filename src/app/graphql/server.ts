@@ -4,8 +4,8 @@ const typeDefs = gql(readFileSync('./src/app/graphql/schema.graphql', 'utf8'));
 import resolvers from './resolvers';
 
 const server = new ApolloServer({
-    typeDefs,
-    resolvers,
+  typeDefs,
+  resolvers,
 });
 
 export default server;
