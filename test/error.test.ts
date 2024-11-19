@@ -5,50 +5,10 @@ import prisma from '../src/app/client/client';
 import 'dotenv/config';
 import bcrypt from 'bcrypt';
 
-describe.only('createUser mutation', () => {
-  const port = process.env.PORT;
-  const url = 'http://localhost:4000/';
-  before(async () => {
-    try {
-      await server.listen(port).then(async ({ url }) => {
-        console.log(url);
-      });
-    } catch (error) {
-      console.log(error);
-    }
+const port = process.env.PORT;
+const url = 'http://localhost:4000/';
 
-    try {
-      await prisma.$connect();
-      console.log('Connected to testdb');
-    } catch (error) {
-      console.log(error);
-    }
-
-    await prisma.user.create({
-      data: {
-        name: 'Sam',
-        email: 'sam@example.com',
-        password: await bcrypt.hash('Sam123', 10),
-        birthDate: '2004-04-09',
-      },
-    });
-  });
-
-  after(async () => {
-    const serverInstance = server;
-    if (serverInstance) {
-      await serverInstance.stop();
-      console.log('Server stopped');
-    }
-    await prisma.user.deleteMany();
-    if (prisma) {
-      await prisma.$disconnect();
-      console.log('Database testdb disconnected');
-    }
-  });
-
-  it('should return an error for existing email', async () => {
-    const mutation = `
+const mutation = `
             mutation createUser($data: UserInput!){
                 createUser(data: $data) {
                     id,
@@ -59,6 +19,47 @@ describe.only('createUser mutation', () => {
             }
         `;
 
+before(async () => {
+  try {
+    await server.listen(port).then(async ({ url }) => {
+      console.log(url);
+    });
+  } catch (error) {
+    console.log(error);
+  }
+
+  try {
+    await prisma.$connect();
+    console.log('Connected to testdb');
+  } catch (error) {
+    console.log(error);
+  }
+
+  await prisma.user.create({
+    data: {
+      name: 'Sam',
+      email: 'sam@example.com',
+      password: await bcrypt.hash('Sam123', 10),
+      birthDate: '2004-04-09',
+    },
+  });
+});
+
+after(async () => {
+  const serverInstance = server;
+  if (serverInstance) {
+    await serverInstance.stop();
+    console.log('Server stopped');
+  }
+  await prisma.user.deleteMany();
+  if (prisma) {
+    await prisma.$disconnect();
+    console.log('Database testdb disconnected');
+  }
+});
+
+describe.only('createUser mutation', () => {
+  it('should return an error for existing email', async () => {
     const variables = {
       data: {
         name: 'Sam',
@@ -68,7 +69,6 @@ describe.only('createUser mutation', () => {
       },
     };
 
-    console.log('Sending query...');
     try {
       await axios.post(url, { query: mutation, variables });
     } catch (error) {
@@ -83,17 +83,6 @@ describe.only('createUser mutation', () => {
   });
 
   it('should return an error for invalid password', async () => {
-    const mutation = `
-            mutation createUser($data: UserInput!){
-                createUser(data: $data) {
-                    id,
-                    name,
-                    email,
-                    birthDate
-                }
-            }
-        `;
-
     const variables = {
       data: {
         name: 'Ben',
@@ -117,17 +106,6 @@ describe.only('createUser mutation', () => {
   });
 
   it('should return an error for invalid input', async () => {
-    const mutation = `
-            mutation createUser($data: UserInput!){
-                createUser(data: $data) {
-                    id,
-                    name,
-                    email,
-                    birthDate
-                }
-            }
-        `;
-
     const variables = {
       data: {
         name: '',
