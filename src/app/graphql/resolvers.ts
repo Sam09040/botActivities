@@ -1,5 +1,6 @@
 import prisma from '../client/client';
-import { LoginInput, UserInput } from '../interfaces';
+import { UserInput } from '../interfaces/user';
+import { LoginInput } from '../interfaces/login';
 import isPasswordValid from './password';
 import bcrypt from 'bcrypt';
 import { CustomError } from '../errors/CustomError';
@@ -142,17 +143,17 @@ export const resolvers = {
       const user = await prisma.user.findUnique({ where: { email: email } });
 
       if (!user) {
-        throw new CustomError('404', 'User not found!', {
+        throw new CustomError('404', 'Wrong email or password!', {
           field: 'email',
-          reason: 'The email you provided does not exist.',
+          reason: 'The email or password is incorrect.',
         });
       }
 
       const isValid = await comparePassword(password, user.password);
       if (!isValid) {
-        throw new CustomError('400', 'Wrong password.', {
+        throw new CustomError('400', 'Wrong email or password.', {
           field: 'password',
-          reason: 'The provided password does not match.',
+          reason: 'The email or password is incorrect.',
         });
       }
       let token = null;

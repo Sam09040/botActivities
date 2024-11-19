@@ -4,13 +4,30 @@ import server from '../src/app/graphql/server';
 import { prisma } from '../src/app/client/client';
 import 'dotenv/config';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 describe('login mutation', () => {
   const port = process.env.PORT;
+  const SECRET = process.env.JWT_SECRET ?? '';
   const url = `http://localhost:${port}/`;
+
+  const mutation = `
+            mutation login ($data: LoginInput!) {
+                login (data: $data) {
+                    user {
+                        id,
+                        name,
+                        email,
+                        birthDate
+                    },
+                    token
+                }
+            }
+        `;
+
   before(async () => {
     try {
-      await server.listen(port).then(async ({ url }) => {
+      await server.listen(port).then(async ({ url }: any) => {
         console.log(url);
       });
     } catch (error) {
@@ -50,19 +67,6 @@ describe('login mutation', () => {
   });
 
   it('should return an error for invalid email', async () => {
-    const mutation = `
-            mutation login ($data: LoginInput!) {
-                login (data: $data) {
-                    user {
-                        id,
-                        name,
-                        email,
-                        birthDate
-                    },
-                    token
-                }
-            }
-        `;
 
     const variables = {
       data: {
@@ -86,20 +90,6 @@ describe('login mutation', () => {
   });
 
   it('should return an error for wrong password', async () => {
-    const mutation = `
-            mutation login ($data: LoginInput!) {
-                login (data: $data) {
-                    user {
-                        id,
-                        name,
-                        email,
-                        birthDate
-                    },
-                    token
-                }
-            }
-        `;
-
     const variables = {
       data: {
         email: 'sam@example.com',
@@ -122,20 +112,6 @@ describe('login mutation', () => {
   });
 
   it('should return success and show the user and a token', async () => {
-    const mutation = `
-            mutation login ($data: LoginInput!) {
-                login (data: $data) {
-                    user {
-                        id,
-                        name,
-                        email,
-                        birthDate
-                    },
-                    token
-                }
-            }
-        `;
-
     const variables = {
       data: {
         email: 'sam@example.com',
@@ -146,76 +122,11 @@ describe('login mutation', () => {
 
     const response = await axios.post(url, { query: mutation, variables });
     const login = response.data.data.login;
-
     expect(response).to.have.property('status', 200);
     expect(login).to.have.property('token').that.is.a('string');
+    const isValid = jwt.verify(login.token, SECRET);
+    expect(isValid).to.have.property('userId').that.is.a('number');
     expect(login.user.name).to.equal('Sam');
     expect(login.user.birthDate).to.equal('09-04-2004');
-  });
-
-  it('should return an error for missing token', async () => {
-    const mutation = `
-            mutation createUser($data: UserInput!){
-                createUser(data: $data) {
-                    id,
-                    name,
-                    email,
-                    birthDate
-                }
-            }
-        `;
-
-    const variables = {
-      data: {
-        name: 'Jeff',
-        email: 'email@example.com',
-        password: 'password123',
-        birthDate: '09-04-2004',
-      },
-    };
-
-    const response = await axios.post(url, { query: mutation, variables });
-    const data = response.data;
-    expect(data).to.have.property('errors');
-    expect(data.errors[0].message).to.equal('Token is required for this operation!');
-    expect(data.errors[0].extensions.code).to.equal('UNAUTHENTICATED');
-    expect(data.errors[0].extensions.field).to.equal('authorization');
-    expect(data.errors[0].extensions.reason).to.equal('A valid token must be provided.');
-    expect(data.errors[0].extensions.http_status).to.equal('400');
-  });
-
-  it('should return an error for invalid token', async () => {
-    const headers = {
-      'Content-Type': 'application/json',
-      Authorization: 'none',
-    };
-    const mutation = `
-            mutation createUser($data: UserInput!){
-                createUser(data: $data) {
-                    id,
-                    name,
-                    email,
-                    birthDate
-                }
-            }
-        `;
-
-    const variables = {
-      data: {
-        name: 'Jeff',
-        email: 'email@example.com',
-        password: 'password123',
-        birthDate: '09-04-2004',
-      },
-    };
-
-    const response = await axios.post(url, { query: mutation, variables }, { headers });
-    const data = response.data;
-    expect(data).to.have.property('errors');
-    expect(data.errors[0].message).to.equal('Token is invalid!');
-    expect(data.errors[0].extensions.code).to.equal('UNAUTHENTICATED');
-    expect(data.errors[0].extensions.field).to.equal('authorization');
-    expect(data.errors[0].extensions.reason).to.equal('A valid token must be provided.');
-    expect(data.errors[0].extensions.http_status).to.equal('401');
   });
 });

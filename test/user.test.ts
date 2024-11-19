@@ -1,16 +1,25 @@
 import { expect } from 'chai';
 import axios from 'axios';
-import server from '../src/index';
+import server from '../src/app/graphql/server';
 import { prisma } from '../src/app/client/client';
 import 'dotenv/config';
 import bcrypt from 'bcrypt';
 
 const port = process.env.PORT;
 const url = `http://localhost:${port}/`;
+const query = `
+              query user($userId: Int!){
+                user(id: $userId) {
+                  name,
+                  email,
+                  birthDate
+                }
+              }
+            `;
 
 before(async () => {
   try {
-    await server.listen(port).then(async ({ url }) => {
+    await server.listen(port).then(async ({ url }: any) => {
       console.log(url);
     });
   } catch (error) {
@@ -48,16 +57,6 @@ after(async () => {
 
 describe('user query', () => {
   it('should return an error for no token', async () => {
-    const query = `
-              query user($userId: Int!){
-                user(id: $userId) {
-                  name,
-                  email,
-                  birthDate
-                }
-              }
-            `;
-
     const variables = {
       userId: 1,
     };
@@ -73,16 +72,6 @@ describe('user query', () => {
   });
 
   it('should return an error for invalid token', async () => {
-    const query = `
-              query user($userId: Int!){
-                user(id: $userId) {
-                  name,
-                  email,
-                  birthDate
-                }
-              }
-            `;
-
     const variables = {
       userId: 1,
     };
@@ -103,16 +92,6 @@ describe('user query', () => {
   });
 
   it('should return an error for id equal 0', async () => {
-    const query = `
-              query user($userId: Int!){
-                user(id: $userId) {
-                  name,
-                  email,
-                  birthDate
-                }
-              }
-            `;
-
     const variables = {
       userId: 0,
     };
@@ -131,16 +110,6 @@ describe('user query', () => {
   });
 
   it.only('should return user', async () => {
-    const query = `
-              query user($userId: Int!){
-                user(id: $userId) {
-                  name,
-                  email,
-                  birthDate
-                }
-              }
-            `;
-
     const user = await prisma.user.findUnique({ where: { email: 'sam@example.com' } });
 
     const variables = {
