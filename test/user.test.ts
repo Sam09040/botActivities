@@ -1,61 +1,33 @@
 import { expect } from 'chai';
 import axios from 'axios';
-import server from '../src/app/graphql/server';
 import { prisma } from '../src/app/client/client';
 import 'dotenv/config';
-import bcrypt from 'bcrypt';
+import StartFinish from './start-finish.test';
 
-const port = process.env.PORT;
-const url = `http://localhost:${port}/`;
-const query = `
-              query user($userId: Int!){
-                user(id: $userId) {
-                  name,
-                  email,
-                  birthDate
+describe('user query', () => {
+  const port = process.env.PORT;
+  const url = `http://localhost:${port}/`;
+  const query = `
+                query user($userId: Int!){
+                  user(id: $userId) {
+                    name,
+                    email,
+                    birthDate
+                  }
                 }
-              }
-            `;
+              `;
 
-before(async () => {
-  try {
-    await server.listen(port).then(async ({ url }: any) => {
-      console.log(url);
-    });
-  } catch (error) {
-    console.log(error.message);
-  }
-
-  try {
-    await prisma.$connect();
-  } catch (error) {
-    console.log(error);
-  }
-  console.log('Connected to testdb');
-
-  await prisma.user.create({
+  const user = {
     data: {
       name: 'Sam',
       email: 'sam@example.com',
-      password: await bcrypt.hash('Sam123', 10),
+      password: 'Sam123',
       birthDate: '09-04-2004',
     },
-  });
-});
+  };
 
-after(async () => {
-  if (server) {
-    await server.stop();
-    console.log('Server stopped');
-  }
-  await prisma.user.deleteMany();
-  if (prisma) {
-    await prisma.$disconnect();
-    console.log('Database testdb disconnected');
-  }
-});
+  StartFinish(user);
 
-describe('user query', () => {
   it('should return an error for no token', async () => {
     const variables = {
       userId: 1,
@@ -91,25 +63,7 @@ describe('user query', () => {
     expect(data.errors[0].extensions.http_status).to.equal('401');
   });
 
-  it('should return an error for id equal 0', async () => {
-    const variables = {
-      userId: 0,
-    };
-
-    try {
-      await axios.post(url, { query, variables });
-    } catch (error) {
-      const err = error.response.data.errors[0];
-      expect(err.message).to.equal('Invalid request!');
-      expect(err.extensions.code).to.equal('400');
-      expect(err.extensions.additionalInfo).to.deep.equal({
-        field: 'id',
-        reason: 'The id needs to be greater than 0!',
-      });
-    }
-  });
-
-  it.only('should return user', async () => {
+  it('should return user', async () => {
     const user = await prisma.user.findUnique({ where: { email: 'sam@example.com' } });
 
     const variables = {
@@ -119,7 +73,7 @@ describe('user query', () => {
     const headers = {
       'Content-Type': 'application/json',
       Authorization:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTczMTM1OTE3NCwiZXhwIjoxNzMxOTYzOTc0fQ.NwKd2vWXAlhZX1qslae7Ark02AGm0jkSBbbMysiLrG0',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTczMjA1ODQ1OSwiZXhwIjoxNzMyNjYzMjU5fQ.Nsg9qGnoVk78-6ghY59h70L3A1iLznZO_NpG0jOg3c0',
     };
 
     const response = await axios.post(url, { query, variables }, { headers });

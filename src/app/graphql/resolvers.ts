@@ -30,13 +30,6 @@ export const resolvers = {
       return users;
     },
     user: async (_: unknown, { id }: { id: number }, { token }: any) => {
-      if (!id) {
-        throw new CustomError('400', 'Invalid request!', {
-          field: 'id',
-          reason: 'The id needs to be greater than 0!',
-        });
-      }
-
       if (!token) {
         throw new AuthenticationError('Token is required for this operation!', {
           http_status: '400',
@@ -56,7 +49,7 @@ export const resolvers = {
       }
 
       const user = prisma.user.findUnique({
-        where: { id: id },
+        where: { id },
       });
       if (user === null) {
         throw new CustomError('404', 'User not found!', {
@@ -140,7 +133,7 @@ export const resolvers = {
         });
       }
 
-      const user = await prisma.user.findUnique({ where: { email: email } });
+      const user = await prisma.user.findUnique({ where: { email } });
 
       if (!user) {
         throw new CustomError('404', 'Wrong email or password!', {

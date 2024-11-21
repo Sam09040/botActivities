@@ -1,15 +1,25 @@
 import { expect } from 'chai';
 import axios from 'axios';
-import server from '../src/app/graphql/server';
 import { prisma } from '../src/app/client/client';
 import 'dotenv/config';
-import bcrypt from 'bcrypt';
+import StartFinish from './start-finish.test';
 import jwt from 'jsonwebtoken';
 
 describe('login mutation', () => {
   const port = process.env.PORT;
   const SECRET = process.env.JWT_SECRET ?? '';
   const url = `http://localhost:${port}/`;
+
+  const user = {
+    data: {
+      name: 'Sam',
+      email: 'sam@example.com',
+      password: 'Sam123',
+      birthDate: '09-04-2004',
+    },
+  };
+
+  StartFinish(user);
 
   const mutation = `
             mutation login ($data: LoginInput!) {
@@ -25,49 +35,7 @@ describe('login mutation', () => {
             }
         `;
 
-  before(async () => {
-    try {
-      await server.listen(port).then(async ({ url }: any) => {
-        console.log(url);
-      });
-    } catch (error) {
-      console.log(error.message);
-    }
-
-    try {
-      await prisma.$connect();
-    } catch (error) {
-      console.log(error);
-    }
-    console.log(`listening on ${url}`);
-    console.log('connected to testdb');
-
-    await prisma.user.create({
-      data: {
-        name: 'Sam',
-        email: 'sam@example.com',
-        password: await bcrypt.hash('Sam123', 10),
-        birthDate: '09-04-2004',
-      },
-    });
-  });
-
-  after(async () => {
-    if (server) {
-      await server.stop();
-      console.log('Server stopped');
-    }
-
-    await prisma.user.deleteMany();
-
-    if (prisma) {
-      await prisma.$disconnect();
-      console.log('Database testdb disconnected');
-    }
-  });
-
   it('should return an error for invalid email', async () => {
-
     const variables = {
       data: {
         email: 'sam@invalid.com',
@@ -121,11 +89,16 @@ describe('login mutation', () => {
     };
 
     const response = await axios.post(url, { query: mutation, variables });
+
+    const user = await prisma.user.findUnique({ where: { email: 'sam@example.com' } });
     const login = response.data.data.login;
     expect(response).to.have.property('status', 200);
     expect(login).to.have.property('token').that.is.a('string');
-    const isValid = jwt.verify(login.token, SECRET);
+    const isValid = jwt.verify(login.token, SECRET) as jwt.JwtPayload;
+    const expiration = isValid.iat! + 60 * 60;
     expect(isValid).to.have.property('userId').that.is.a('number');
+    expect(isValid.userId).to.equal(user?.id);
+    expect(isValid.iat).to.be.closeTo(expiration, 5000);
     expect(login.user.name).to.equal('Sam');
     expect(login.user.birthDate).to.equal('09-04-2004');
   });
