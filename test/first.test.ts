@@ -2,13 +2,13 @@ import { expect } from 'chai';
 import axios from 'axios';
 import prisma from '../src/app/client/client';
 import 'dotenv/config';
-import StartFinish from './start-finish.test';
+import { connectDb, connectServer } from './util/connect.util';
+import { disconnectDb, disconnectServer } from './util/disconnect.util';
 
 const port = process.env.PORT;
 const url = `http://localhost:${port}/`;
 
 describe('createUser mutation', () => {
-  StartFinish();
   const mutation = `
             mutation createUser($data: UserInput!){
                 createUser(data: $data) {
@@ -19,6 +19,17 @@ describe('createUser mutation', () => {
                 }
             }
         `;
+
+  before('before', async () => {
+    await connectServer();
+    await connectDb();
+  });
+
+  after('after', async () => {
+    await disconnectServer();
+    await prisma.user.deleteMany();
+    await disconnectDb();
+  });
 
   it('should create an user successfully', async () => {
     const variables = {
@@ -63,7 +74,7 @@ describe('createUser mutation', () => {
       },
     };
 
-    const response = await axios.post(url, { query: mutation, variables });
+    const response = await axios.post(url, { query: mutation, variables },);
     const data = response.data;
     expect(data).to.have.property('errors');
     expect(data.errors[0].message).to.equal('Token is required for this operation!');

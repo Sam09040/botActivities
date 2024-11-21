@@ -2,8 +2,10 @@ import { expect } from 'chai';
 import axios from 'axios';
 import { prisma } from '../src/app/client/client';
 import 'dotenv/config';
-import StartFinish from './start-finish.test';
 import jwt from 'jsonwebtoken';
+import { connectServer, connectDb } from './util/connect.util';
+import { createUser } from './util/create.util';
+import { disconnectServer, disconnectDb } from './util/disconnect.util';
 
 describe('login mutation', () => {
   const port = process.env.PORT;
@@ -19,7 +21,17 @@ describe('login mutation', () => {
     },
   };
 
-  StartFinish(user);
+  before('Begin services', async () => {
+    await connectServer();
+    await  createUser(user);
+    await connectDb();
+  });
+
+  after('End services', async () => {
+    await disconnectServer();
+    await prisma.user.deleteMany();
+    await disconnectDb();
+  });
 
   const mutation = `
             mutation login ($data: LoginInput!) {

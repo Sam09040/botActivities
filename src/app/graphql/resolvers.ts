@@ -7,9 +7,10 @@ import { CustomError } from '../errors/CustomError';
 import jwt from 'jsonwebtoken';
 import 'dotenv/config';
 import { AuthenticationError } from 'apollo-server';
+import ContextType from './context-type';
 const JWT_SECRET = process.env.JWT_SECRET ?? '';
 
-const comparePassword = async (password: string, hashedPassword: string) => {
+const comparePassword = async (password: string, hashedPassword: string): Promise<boolean> => {
   const isMatch = await bcrypt.compare(password, hashedPassword);
   return isMatch;
 };
@@ -29,7 +30,8 @@ export const resolvers = {
 
       return users;
     },
-    user: async (_: unknown, { id }: { id: number }, { token }: any) => {
+    user: async (_: unknown, { id }: { id: number }, context: ContextType) => {
+      const { token } = context;
       if (!token) {
         throw new AuthenticationError('Token is required for this operation!', {
           http_status: '400',
@@ -62,9 +64,9 @@ export const resolvers = {
     },
   },
   Mutation: {
-    createUser: async (_: unknown, { data }: UserInput, { token }: any) => {
+    createUser: async (_: unknown, { data }: UserInput, context: ContextType) => {
       const { name, email, password, birthDate } = data;
-
+      const { token } = context;
       if (!token) {
         throw new AuthenticationError('Token is required for this operation!', {
           http_status: '400',

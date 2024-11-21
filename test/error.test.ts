@@ -1,7 +1,10 @@
 import { expect } from 'chai';
 import axios from 'axios';
 import 'dotenv/config';
-import StartFinish from './start-finish.test';
+import { connectDb, connectServer } from './util/connect.util';
+import { createUser } from './util/create.util';
+import { disconnectDb, disconnectServer } from './util/disconnect.util';
+import prisma from '../src/app/client/client';
 
 describe('createUser mutation error', () => {
   const port = process.env.PORT;
@@ -18,6 +21,12 @@ describe('createUser mutation error', () => {
               }
           `;
 
+  const headers = {
+    'Content-Type': 'application/json',
+    Authorization:
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTczMjA1ODQ1OSwiZXhwIjoxNzMyNjYzMjU5fQ.Nsg9qGnoVk78-6ghY59h70L3A1iLznZO_NpG0jOg3c0',
+  }
+
   const user = {
     data: {
       name: 'Sam',
@@ -27,7 +36,18 @@ describe('createUser mutation error', () => {
     },
   };
 
-  StartFinish(user);
+  before('Begin services', async () => {
+    await connectServer();
+    await connectDb();
+    await createUser(user);
+  });
+
+  after('End services', async () => {
+    await disconnectServer();
+    await prisma.user.deleteMany();
+    await disconnectDb();
+  });
+
 
   it('should return an error for existing email', async () => {
     const variables = {
@@ -39,17 +59,14 @@ describe('createUser mutation error', () => {
       },
     };
 
-    try {
-      await axios.post(url, { query: mutation, variables });
-    } catch (error) {
-      const graphqlError = error.response.data.errors[0];
-      expect(graphqlError.message).to.equal('Email already exists!');
-      expect(graphqlError.extensions.code).to.equal('400');
-      expect(graphqlError.extensions.additionalInfo).to.deep.equal({
-        field: 'email',
-        reason: 'The email you provided is already in use. Please choose a different email address.',
-      });
-    }
+    const response = await axios.post(url, { query: mutation, variables }, { headers });
+    const graphqlError = response.data.errors[0];
+    expect(graphqlError.message).to.equal('Email already exists!');
+    expect(graphqlError.code).to.equal('400');
+    expect(graphqlError.additionalInfo).to.deep.equal({
+      field: 'email',
+      reason: 'The email you provided is already in use. Please choose a different email address.',
+    });
   });
 
   it('should return an error for invalid password', async () => {
@@ -62,17 +79,15 @@ describe('createUser mutation error', () => {
       },
     };
 
-    try {
-      await axios.post(url, { query: mutation, variables });
-    } catch (error) {
-      const graphqlError = error.response.data.errors[0];
+      const response = await axios.post(url, { query: mutation, variables }, { headers });
+      const graphqlError = response.data.errors[0];
       expect(graphqlError.message).to.equal(`Password doesn't fit requirements!`);
-      expect(graphqlError.extensions.code).to.equal('401');
-      expect(graphqlError.extensions.additionalInfo).to.deep.equal({
+      expect(graphqlError.code).to.equal('401');
+      expect(graphqlError.additionalInfo).to.deep.equal({
         field: 'password',
         reason: 'Password must be at least 6 characters long, have a least one letter and one digit!',
       });
-    }
+    
   });
 
   it('should return an error for invalid input', async () => {
@@ -85,20 +100,19 @@ describe('createUser mutation error', () => {
       },
     };
 
-    try {
-      await axios.post(url, { query: mutation, variables });
-    } catch (error) {
-      const graphqlError = error.response.data.errors[0];
+      const response = await axios.post(url, { query: mutation, variables }, { headers });
+      const graphqlError = response.data.errors[0];
       expect(graphqlError.message).to.equal('Invalid input!');
-      expect(graphqlError.extensions.code).to.equal('400');
-      expect(graphqlError.extensions.additionalInfo).to.deep.equal({
+      expect(graphqlError.code).to.equal('400');
+      expect(graphqlError.additionalInfo).to.deep.equal({
         field: 'data',
         reason: 'Name, email, password and birthDate are required!',
       });
-    }
+    
   });
 
   it('should return an error for no users', async () => {
+    await prisma.user.deleteMany();
     const query = `
             query users{
               users {
@@ -110,16 +124,14 @@ describe('createUser mutation error', () => {
             }
         `;
 
-    try {
-      await axios.post(url, { query });
-    } catch (error) {
-      const graphqlError = error.response.data.errors[0];
+      const response = await axios.post(url, { query });
+      const graphqlError = response.data.errors[0];
       expect(graphqlError.message).to.equal('Users not found!');
-      expect(graphqlError.extensions.code).to.equal('404');
-      expect(graphqlError.extensions.additionalInfo).to.deep.equal({
+      expect(graphqlError.code).to.equal('404');
+      expect(graphqlError.additionalInfo).to.deep.equal({
         field: 'User',
         reason: 'There are no users.',
       });
-    }
+    
   });
 });

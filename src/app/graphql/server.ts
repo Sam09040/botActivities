@@ -3,6 +3,7 @@ import { readFileSync } from 'fs';
 import { CustomError } from '../errors/CustomError';
 const typeDefs = gql(readFileSync('./src/app/graphql/schema.graphql', 'utf8'));
 import resolvers from './resolvers';
+import ContextType from './context-type';
 
 const server = new ApolloServer({
   typeDefs,
@@ -25,7 +26,7 @@ const server = new ApolloServer({
     }
     return err;
   },
-  context: async ({ req }) => {
+  context: ({ req }): ContextType => {
     const token = req.headers.authorization ?? null;
     return { token };
   },

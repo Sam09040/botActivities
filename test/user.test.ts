@@ -2,7 +2,10 @@ import { expect } from 'chai';
 import axios from 'axios';
 import { prisma } from '../src/app/client/client';
 import 'dotenv/config';
-import StartFinish from './start-finish.test';
+import { connectServer, connectDb } from './util/connect.util';
+import { disconnectServer, disconnectDb } from './util/disconnect.util';
+import { createUser } from './util/create.util';
+
 
 describe('user query', () => {
   const port = process.env.PORT;
@@ -26,7 +29,17 @@ describe('user query', () => {
     },
   };
 
-  StartFinish(user);
+  before('Begin services', async () => {
+    await connectServer();
+    await createUser(user);
+    await connectDb();
+  })
+  after('End services', async () => {
+    await disconnectServer();
+    await prisma.user.deleteMany();
+    await disconnectDb();
+  });
+
 
   it('should return an error for no token', async () => {
     const variables = {
