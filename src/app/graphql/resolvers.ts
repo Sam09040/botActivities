@@ -1,5 +1,5 @@
 import prisma from '../client/client';
-import { UserInput, LoginInput, User } from '../interfaces/';
+import { UserInput, LoginInput } from '../interfaces/';
 import { isPasswordValid, comparePassword } from './password';
 import bcrypt from 'bcrypt';
 import { CustomError } from '../errors/CustomError';
@@ -22,32 +22,29 @@ export const resolvers = {
           field: 'authorization',
           reason: 'A valid token must be provided.',
         });
-      };
+      }
 
       verifyToken(token, JWT_SECRET);
 
-      const users = await prisma.user.findMany();
+      if (!end) {
+        end = 10;
+      }
+
+      const users = await prisma.user.findMany({
+        take: end,
+        orderBy: {
+          name: 'asc',
+        },
+      });
+
       if (!users.length) {
         throw new CustomError('404', 'Users not found!', {
           field: 'User',
           reason: 'There are no users.',
         });
-      };
+      }
 
-      const sortUsers = (users: User[]): User[] => {
-        return users.sort((a, b) => a.name.localeCompare(b.name));
-      };
-
-      let sortedUsers = sortUsers(users);
-
-      if (!end) {
-        end = 10;
-        sortedUsers = sortedUsers.slice(0, end);
-      } else {
-        sortedUsers = sortedUsers.slice(0, end);
-      };
-
-      return sortedUsers;
+      return users;
     },
     user: async (_: unknown, { id }: { id: number }, context: ContextType) => {
       const { token } = context;
@@ -57,7 +54,7 @@ export const resolvers = {
           field: 'authorization',
           reason: 'A valid token must be provided.',
         });
-      };
+      }
 
       verifyToken(token, JWT_SECRET);
 
@@ -69,7 +66,7 @@ export const resolvers = {
           field: 'id',
           reason: 'The provided id does not exist.',
         });
-      };
+      }
 
       return user;
     },
@@ -84,7 +81,7 @@ export const resolvers = {
           field: 'authorization',
           reason: 'A valid token must be provided.',
         });
-      };
+      }
 
       verifyToken(token, JWT_SECRET);
 
@@ -93,7 +90,7 @@ export const resolvers = {
           field: 'data',
           reason: 'Name, email, password and birthDate are required!',
         });
-      };
+      }
 
       const existingEmail = await prisma.user.findUnique({
         where: { email },
@@ -104,14 +101,14 @@ export const resolvers = {
           field: 'email',
           reason: 'The email you provided is already in use. Please choose a different email address.',
         });
-      };
+      }
 
       if (!isPasswordValid(password)) {
         throw new CustomError('401', `Password doesn't fit requirements!`, {
           field: 'password',
           reason: 'Password must be at least 6 characters long, have a least one letter and one digit!',
         });
-      };
+      }
 
       const newUser = await prisma.user.create({
         data: {
@@ -136,7 +133,7 @@ export const resolvers = {
           field: 'data',
           reason: 'Email and password are required!',
         });
-      };
+      }
 
       const user = await prisma.user.findUnique({ where: { email } });
 
@@ -145,7 +142,7 @@ export const resolvers = {
           field: 'email',
           reason: 'The email or password is incorrect.',
         });
-      };
+      }
 
       const isValid = await comparePassword(password, user.password);
       if (!isValid) {
@@ -153,13 +150,13 @@ export const resolvers = {
           field: 'password',
           reason: 'The email or password is incorrect.',
         });
-      };
+      }
       let token = null;
       if (rememberMe) {
         token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '1w' });
       } else {
         token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '1h' });
-      };
+      }
 
       return {
         user: {
