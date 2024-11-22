@@ -1,5 +1,5 @@
 import server from './app/graphql/server';
 
-server.listen().then(async ({ url }) => {
+server.listen(process.env.PORT).then(async ({ url }) => {
   console.log(url);
 });

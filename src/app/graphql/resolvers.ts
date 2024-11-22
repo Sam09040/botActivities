@@ -1,8 +1,19 @@
-import { prisma } from '../client/client';
-import { UserInput } from '../interfaces';
+import prisma from '../client/client';
+import { UserInput } from '../interfaces/user';
+import { LoginInput } from '../interfaces/login';
 import isPasswordValid from './password';
 import bcrypt from 'bcrypt';
 import { CustomError } from '../errors/CustomError';
+import jwt from 'jsonwebtoken';
+import 'dotenv/config';
+import { AuthenticationError } from 'apollo-server';
+import ContextType from './context-type';
+const JWT_SECRET = process.env.JWT_SECRET ?? '';
+
+const comparePassword = async (password: string, hashedPassword: string): Promise<boolean> => {
+  const isMatch = await bcrypt.compare(password, hashedPassword);
+  return isMatch;
+};
 
 export const resolvers = {
   Query: {
@@ -19,9 +30,28 @@ export const resolvers = {
 
       return users;
     },
-    user: async (_: unknown, { id }: { id: number }) => {
+    user: async (_: unknown, { id }: { id: number }, context: ContextType) => {
+      const { token } = context;
+      if (!token) {
+        throw new AuthenticationError('Token is required for this operation!', {
+          http_status: '400',
+          field: 'authorization',
+          reason: 'A valid token must be provided.',
+        });
+      }
+
+      try {
+        jwt.verify(token, JWT_SECRET);
+      } catch (error) {
+        throw new AuthenticationError('Token is invalid!', {
+          http_status: '401',
+          field: 'authorization',
+          reason: 'A valid token must be provided.',
+        });
+      }
+
       const user = prisma.user.findUnique({
-        where: { id: id },
+        where: { id },
       });
       if (user === null) {
         throw new CustomError('404', 'User not found!', {
@@ -34,15 +64,26 @@ export const resolvers = {
     },
   },
   Mutation: {
-    createUser: async (_: unknown, { data }: UserInput) => {
-      if (!data) {
-        throw new CustomError('400', 'Data is missing!', {
-          field: 'data',
-          reason: 'You need to input data!',
+    createUser: async (_: unknown, { data }: UserInput, context: ContextType) => {
+      const { name, email, password, birthDate } = data;
+      const { token } = context;
+      if (!token) {
+        throw new AuthenticationError('Token is required for this operation!', {
+          http_status: '400',
+          field: 'authorization',
+          reason: 'A valid token must be provided.',
         });
       }
 
-      const { name, email, password, birthDate } = data;
+      try {
+        jwt.verify(token, JWT_SECRET);
+      } catch (error) {
+        throw new AuthenticationError('Token is invalid!', {
+          http_status: '401',
+          field: 'authorization',
+          reason: 'A valid token must be provided.',
+        });
+      }
 
       if (!name || !email || !password || !birthDate) {
         throw new CustomError('400', 'Invalid input!', {
@@ -82,6 +123,49 @@ export const resolvers = {
         name: newUser.name,
         email: newUser.email,
         birthDate: newUser.birthDate,
+      };
+    },
+    login: async (_: unknown, { data }: LoginInput) => {
+      const { email, password, rememberMe } = data;
+
+      if (!email || !password) {
+        throw new CustomError('400', 'Invalid input!', {
+          field: 'data',
+          reason: 'Email and password are required!',
+        });
+      }
+
+      const user = await prisma.user.findUnique({ where: { email } });
+
+      if (!user) {
+        throw new CustomError('404', 'Wrong email or password!', {
+          field: 'email',
+          reason: 'The email or password is incorrect.',
+        });
+      }
+
+      const isValid = await comparePassword(password, user.password);
+      if (!isValid) {
+        throw new CustomError('400', 'Wrong email or password.', {
+          field: 'password',
+          reason: 'The email or password is incorrect.',
+        });
+      }
+      let token = null;
+      if (rememberMe) {
+        token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '1w' });
+      } else {
+        token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '1h' });
+      }
+
+      return {
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          birthDate: user.birthDate,
+        },
+        token,
       };
     },
   },
