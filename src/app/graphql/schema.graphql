@@ -1,5 +1,5 @@
 type Query{
-    users: [User],
+    users(end: Int): [User],
     user(id: Int!): User,
     hello: String
 }
