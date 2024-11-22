@@ -8,12 +8,11 @@
     "dev": "tsx watch src/index.ts",
     "lint": "eslint src/**/*.ts test/**/*.ts",
     "check": "prettier --write src/**/*.ts test/**/*.ts && npm run lint",
-    "lint": "eslint src/**/*.ts test/**/*.ts --fix",
     "start_test": "npx dotenvx run --env-file=.env.test -- npm run start",
     "test": "TSIMP_DIAG=error npx dotenvx run --env-file=.env.test -- mocha --import=tsimp/import test/*.test.ts",
     "reset": "npx prisma db push --force-reset",
     "reset_test": "npx dotenvx run --env-file=.env.test -- npx prisma db push --force-reset",
-    "seeds": "node --import=tsimp/import seed/seed.ts"
+    "seeds": "node --import=tsimp/import snaplet/seed/seed.ts"
   },
   "keywords": [
     "apollo",
@@ -24,8 +23,10 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@faker-js/faker": "9.2.0",
     "@prisma/client": "5.20.0",
     "apollo-server": "3.13.0",
+    "date-fns": "4.1.0",
     "fs": "0.0.1-security",
     "graphql": "16.9.0"
   },
