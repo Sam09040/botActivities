@@ -1,5 +1,5 @@
 type Query{
-    users(end: Int): [User],
+    users(skip: Int, limit: Int): UsersPayload,
     user(id: Int!): User,
     hello: String
 }
@@ -19,6 +19,13 @@ type User{
 type AuthPayload {
     user: User!
     token: String!
+}
+
+type UsersPayload {
+    users: [User]!,
+    totalUsers: Int,
+    page: Int,
+    maxPage: Int
 }
 
 input UserInput{

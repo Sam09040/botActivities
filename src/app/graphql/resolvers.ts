@@ -1,19 +1,23 @@
-import prisma from '../client/client';
-import { UserInput, LoginInput } from '../interfaces/';
+import { AuthenticationError } from 'apollo-server';
+import { dbClient } from '../client/client';
+import { UserInput, LoginInput, User } from '../interfaces/';
 import { isPasswordValid, comparePassword } from './password';
-import bcrypt from 'bcrypt';
 import { CustomError } from '../errors/CustomError';
+import { verifyToken } from '../client/validation';
+import { ContextType } from './context-type';
+import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import 'dotenv/config';
-import { AuthenticationError } from 'apollo-server';
-import ContextType from './context-type';
-import { verifyToken } from '../client/validation';
 const JWT_SECRET = process.env.JWT_SECRET ?? '';
 
 export const resolvers = {
   Query: {
     hello: (): string => 'hello!',
-    users: async (_: unknown, { end }: { end: number }, context: ContextType) => {
+    users: async (
+      _: unknown,
+      { skip, limit }: { skip: number | undefined; limit: number | undefined },
+      context: ContextType,
+    ) => {
       const { token } = context;
 
       if (!token) {
@@ -26,25 +30,42 @@ export const resolvers = {
 
       verifyToken(token, JWT_SECRET);
 
-      if (!end) {
-        end = 10;
-      }
+      const totalUsers = await dbClient.user.count();
 
-      const users = await prisma.user.findMany({
-        take: end,
-        orderBy: {
-          name: 'asc',
-        },
-      });
-
-      if (!users.length) {
+      if (!totalUsers) {
         throw new CustomError('404', 'Users not found!', {
           field: 'User',
           reason: 'There are no users.',
         });
       }
 
-      return users;
+      if (!limit) {
+        limit = 10;
+      }
+
+      const paginatedUsers = await dbClient.user.findMany({
+        skip,
+        take: limit,
+        orderBy: {
+          name: 'asc',
+        },
+      });
+
+      const maxPage = Math.round(totalUsers / limit);
+      let page;
+      
+      if (skip) {
+        page = Math.round(skip / limit);
+      } else {
+        page = 1;
+      }
+
+      return {
+        users: paginatedUsers,
+        totalUsers,
+        page,
+        maxPage,
+      };
     },
     user: async (_: unknown, { id }: { id: number }, context: ContextType) => {
       const { token } = context;
@@ -58,7 +79,7 @@ export const resolvers = {
 
       verifyToken(token, JWT_SECRET);
 
-      const user = prisma.user.findUnique({
+      const user = dbClient.user.findUnique({
         where: { id },
       });
       if (user === null) {
@@ -72,7 +93,7 @@ export const resolvers = {
     },
   },
   Mutation: {
-    createUser: async (_: unknown, { data }: UserInput, context: ContextType) => {
+    createUser: async (_: unknown, { data }: UserInput, context: ContextType): Promise<User> => {
       const { name, email, password, birthDate } = data;
       const { token } = context;
       if (!token) {
@@ -92,7 +113,7 @@ export const resolvers = {
         });
       }
 
-      const existingEmail = await prisma.user.findUnique({
+      const existingEmail = await dbClient.user.findUnique({
         where: { email },
       });
 
@@ -110,7 +131,7 @@ export const resolvers = {
         });
       }
 
-      const newUser = await prisma.user.create({
+      const newUser = await dbClient.user.create({
         data: {
           name,
           email,
@@ -135,7 +156,7 @@ export const resolvers = {
         });
       }
 
-      const user = await prisma.user.findUnique({ where: { email } });
+      const user = await dbClient.user.findUnique({ where: { email } });
 
       if (!user) {
         throw new CustomError('404', 'Wrong email or password!', {
@@ -170,5 +191,3 @@ export const resolvers = {
     },
   },
 };
-
-export default resolvers;

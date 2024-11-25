@@ -1,11 +1,11 @@
 import { ApolloServer, AuthenticationError, gql } from 'apollo-server';
 import { readFileSync } from 'fs';
 import { CustomError } from '../errors/CustomError';
+import { ContextType } from './context-type';
+import { resolvers } from './resolvers';
 const typeDefs = gql(readFileSync('./src/app/graphql/schema.graphql', 'utf8'));
-import resolvers from './resolvers';
-import ContextType from './context-type';
 
-const server = new ApolloServer({
+export const server = new ApolloServer({
   typeDefs,
   resolvers,
   formatError: (err) => {
@@ -31,5 +31,3 @@ const server = new ApolloServer({
     return { token };
   },
 });
-
-export default server;
