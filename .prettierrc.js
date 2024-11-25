@@ -3,7 +3,8 @@ const modules = {
   singleQuote: true,
   printWidth: 120,
   tabWidth: 2,
-  bracketSpacing: true
+  bracketSpacing: true,
+  semi: true,
 };
 
 export default modules;
