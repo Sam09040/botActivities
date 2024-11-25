@@ -6,12 +6,13 @@
   "scripts": {
     "start": "TSIMP_DIAG=error node --import=tsimp/import src/index.ts",
     "dev": "tsx watch src/index.ts",
+    "lint": "eslint src/**/*.ts test/**/*.ts",
     "check": "prettier --write src/**/*.ts test/**/*.ts && npm run lint",
-    "lint": "eslint src/**/*.ts test/**/*.ts --fix",
     "start_test": "npx dotenvx run --env-file=.env.test -- npm run start",
     "test": "TSIMP_DIAG=error npx dotenvx run --env-file=.env.test -- mocha --import=tsimp/import test/*.test.ts",
     "reset": "npx prisma db push --force-reset",
-    "reset_test": "npx dotenvx run --env-file=.env.test -- npx prisma db push --force-reset"
+    "reset_test": "npx dotenvx run --env-file=.env.test -- npx prisma db push --force-reset",
+    "seeds": "node --import=tsimp/import snaplet/seed/seed.ts"
   },
   "keywords": [
     "apollo",
@@ -22,8 +23,10 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@faker-js/faker": "9.2.0",
     "@prisma/client": "5.20.0",
     "apollo-server": "3.13.0",
+    "date-fns": "4.1.0",
     "fs": "0.0.1-security",
     "graphql": "16.9.0"
   },
@@ -32,6 +35,8 @@
     "@apollo/server": "4.11.2",
     "@dotenvx/dotenvx": "1.19.2",
     "@eslint/js": "9.11.1",
+    "@snaplet/copycat": "5.1.0",
+    "@snaplet/seed": "0.98.0",
     "@types/bcrypt": "5.0.2",
     "@types/chai": "5.0.0",
     "@types/jsonwebtoken": "9.0.7",

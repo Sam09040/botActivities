@@ -5,3 +5,4 @@
 /prisma/migrations
 .vscode
 .tsimp
+.snaplet
