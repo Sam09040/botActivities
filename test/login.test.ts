@@ -1,15 +1,13 @@
 import { expect } from 'chai';
 import axios from 'axios';
-import { prisma } from '../src/app/client/client';
 import 'dotenv/config';
-import jwt from 'jsonwebtoken';
 import { connectServer, connectDb } from './util/connect.util';
-import { createUser } from './util/create.util';
 import { disconnectServer, disconnectDb } from './util/disconnect.util';
+import { createUser, deleteAll, findUserByEmail } from '../src/data/db/user';
+import { verifyToken } from '../src/data/validation/validation';
 
 describe('login mutation', () => {
   const port = process.env.PORT;
-  const SECRET = process.env.JWT_SECRET ?? '';
   const url = `http://localhost:${port}/`;
 
   const user = {
@@ -23,13 +21,13 @@ describe('login mutation', () => {
 
   before('Begin services', async () => {
     await connectServer();
-    await  createUser(user);
+    await createUser(user);
     await connectDb();
   });
 
   after('End services', async () => {
     await disconnectServer();
-    await prisma.user.deleteMany();
+    deleteAll();
     await disconnectDb();
   });
 
@@ -102,11 +100,11 @@ describe('login mutation', () => {
 
     const response = await axios.post(url, { query: mutation, variables });
 
-    const user = await prisma.user.findUnique({ where: { email: 'sam@example.com' } });
+    const user = await findUserByEmail('sam@example.com');
     const login = response.data.data.login;
     expect(response).to.have.property('status', 200);
     expect(login).to.have.property('token').that.is.a('string');
-    const isValid = jwt.verify(login.token, SECRET) as jwt.JwtPayload;
+    const isValid = verifyToken(login.token);
     const expiration = isValid.iat! + 60 * 60;
     expect(isValid).to.have.property('userId').that.is.a('number');
     expect(isValid.userId).to.equal(user?.id);

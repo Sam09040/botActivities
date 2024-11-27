@@ -1,11 +1,9 @@
-import { expect } from 'chai';
-import axios from 'axios';
-import { prisma } from '../src/app/client/client';
 import 'dotenv/config';
+import axios from 'axios';
+import { expect } from 'chai';
 import { connectServer, connectDb } from './util/connect.util';
 import { disconnectServer, disconnectDb } from './util/disconnect.util';
-import { createUser } from './util/create.util';
-
+import { createUser, deleteAll, findUserByEmail } from '../src/data/db/user';
 
 describe('user query', () => {
   const port = process.env.PORT;
@@ -33,13 +31,12 @@ describe('user query', () => {
     await connectServer();
     await createUser(user);
     await connectDb();
-  })
+  });
   after('End services', async () => {
     await disconnectServer();
-    await prisma.user.deleteMany();
+    deleteAll();
     await disconnectDb();
   });
-
 
   it('should return an error for no token', async () => {
     const variables = {
@@ -77,7 +74,7 @@ describe('user query', () => {
   });
 
   it('should return user', async () => {
-    const user = await prisma.user.findUnique({ where: { email: 'sam@example.com' } });
+    const user = await findUserByEmail('sam@example.com');
 
     const variables = {
       userId: user?.id,

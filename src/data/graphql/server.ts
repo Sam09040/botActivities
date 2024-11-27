@@ -3,7 +3,7 @@ import { readFileSync } from 'fs';
 import { CustomError } from '../errors/CustomError';
 import { ContextType } from './context-type';
 import { resolvers } from './resolvers';
-const typeDefs = gql(readFileSync('./src/app/graphql/schema.graphql', 'utf8'));
+const typeDefs = gql(readFileSync('./src/data/graphql/schema.graphql', 'utf8'));
 
 export const server = new ApolloServer({
   typeDefs,
@@ -27,7 +27,7 @@ export const server = new ApolloServer({
     return err;
   },
   context: ({ req }): ContextType => {
-    const token = req.headers.authorization ?? null;
+    const token = req.headers.authorization ?? undefined;
     return { token };
   },
 });

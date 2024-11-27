@@ -1,3 +1,3 @@
 export type ContextType = {
-  token: string | null;
+  token: string | undefined;
 };

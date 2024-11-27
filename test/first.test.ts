@@ -1,9 +1,9 @@
 import { expect } from 'chai';
 import axios from 'axios';
-import prisma from '../src/app/client/client';
 import 'dotenv/config';
 import { connectDb, connectServer } from './util/connect.util';
 import { disconnectDb, disconnectServer } from './util/disconnect.util';
+import { deleteAll, findUserByEmail } from '../src/data/db/user';
 
 const port = process.env.PORT;
 const url = `http://localhost:${port}/`;
@@ -27,7 +27,7 @@ describe('createUser mutation', () => {
 
   after('after', async () => {
     await disconnectServer();
-    await prisma.user.deleteMany();
+    deleteAll();
     await disconnectDb();
   });
 
@@ -56,9 +56,7 @@ describe('createUser mutation', () => {
     expect(data.createUser.email).to.equal('sam@example.com');
     expect(data.createUser.birthDate).to.equal('09-04-2004');
 
-    const userInDb = await prisma.user.findUnique({
-      where: { email: 'sam@example.com' },
-    });
+    const userInDb = await findUserByEmail('sam@example.com');
 
     expect(userInDb).to.not.equal(null);
     expect(userInDb?.name).to.equal('Sam');
@@ -74,7 +72,7 @@ describe('createUser mutation', () => {
       },
     };
 
-    const response = await axios.post(url, { query: mutation, variables },);
+    const response = await axios.post(url, { query: mutation, variables });
     const data = response.data;
     expect(data).to.have.property('errors');
     expect(data.errors[0].message).to.equal('Token is required for this operation!');

@@ -1,18 +1,17 @@
-import { createSeedClient } from '@snaplet/seed'
-import { PrismaClient } from '@prisma/client';
+
+import { User } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 import { format } from 'date-fns';
+import { findUserById } from '../../src/data/db/user';
+import { getSeedClient } from './seed-client';
+import { resetDatabase } from './reset-database';
 
+export const seedUsers = async (length?: number) => {
+    let existingUser: User | null;
+    existingUser = await findUserById(1);
 
-export const seedUsers = async () => {
-    const prisma = new PrismaClient();
-    const existingUser = await prisma.user.findUnique({ where: { id: 1 } });
-    
-    const seed = await createSeedClient({
-        dryRun: false
-    });
-    
-    await seed.$resetDatabase(["! _prisma_migrations", "! public.User"]);
+    const seed = await getSeedClient(false);
+    await resetDatabase(seed);
     
     if (existingUser) {
         await seed.user((x) => x(1, {
@@ -23,10 +22,14 @@ export const seedUsers = async () => {
             birthDate: existingUser.birthDate,
         }));
     }
-    const users = Array.from({ length: 50 }).map(() => {
+
+    !length ? length = 50 : length
+
+    const users = Array.from({ length }).map(() => {
         const firstName = faker.person.firstName();
         const lastName = faker.person.lastName();
-        const email = `${firstName.toLowerCase()}@example.com`;
+        const emailLastName = lastName.slice(0, 3).toLowerCase();
+        const email = `${firstName.toLowerCase()}${emailLastName}@example.com`;
         const password = faker.internet.password();
         const birthDate = format(faker.date.birthdate({ min: 18, max: 80, mode: 'age' }), 'dd-MM-yyyy');
 
