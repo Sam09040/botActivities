@@ -4,19 +4,22 @@ import { expect } from 'chai';
 import { connectServer, connectDb } from './util/connect.util';
 import { disconnectServer, disconnectDb } from './util/disconnect.util';
 import { createUser, deleteAll, findUserByEmail } from '../src/data/db/user';
+import { getToken } from './util/get-token.util';
 
 describe('user query', () => {
   const port = process.env.PORT;
   const url = `http://localhost:${port}/`;
   const query = `
-                query user($userId: Int!){
-                  user(id: $userId) {
-                    name,
-                    email,
-                    birthDate
-                  }
-                }
-              `;
+    query user($userId: Int!){
+      user(id: $userId) {
+        name,
+        email,
+        birthDate
+      }
+    }
+  `;
+
+  let token: string | undefined;
 
   const user = {
     data: {
@@ -29,8 +32,8 @@ describe('user query', () => {
 
   before('Begin services', async () => {
     await connectServer();
-    await createUser(user);
     await connectDb();
+    await createUser(user);
   });
   after('End services', async () => {
     await disconnectServer();
@@ -75,15 +78,14 @@ describe('user query', () => {
 
   it('should return user', async () => {
     const user = await findUserByEmail('sam@example.com');
-
+    token = await getToken(url);
     const variables = {
       userId: user?.id,
     };
 
     const headers = {
       'Content-Type': 'application/json',
-      Authorization:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTczMjA1ODQ1OSwiZXhwIjoxNzMyNjYzMjU5fQ.Nsg9qGnoVk78-6ghY59h70L3A1iLznZO_NpG0jOg3c0',
+      Authorization: token,
     };
 
     const response = await axios.post(url, { query, variables }, { headers });

@@ -1,6 +1,5 @@
 import { AuthenticationError } from 'apollo-server';
 import { dbClient } from '../../db/client';
-import { CustomError } from '../../errors/CustomError';
 import { verifyToken } from '../../validation/validation';
 
 export const usersQuery = async (skip: number | undefined, limit: number | undefined, token: string | undefined) => {
@@ -15,19 +14,11 @@ export const usersQuery = async (skip: number | undefined, limit: number | undef
   verifyToken(token);
 
   const totalUsers = await dbClient.user.count();
-
-  if (!totalUsers) {
-    throw new CustomError('404', 'No users found!', {
-      field: 'User',
-      reason: 'There are no users.',
-    });
-  }
-
   if (!limit) {
     limit = 10;
   }
 
-  const paginatedUsers = await dbClient.user.findMany({
+  const users = await dbClient.user.findMany({
     skip,
     take: limit,
     orderBy: {
@@ -37,10 +28,10 @@ export const usersQuery = async (skip: number | undefined, limit: number | undef
 
   const maxPage = Math.round(totalUsers / limit);
 
-  const page = skip ? Math.round(skip / limit) : 0;
+  const page = skip ? Math.ceil(skip / limit) : 1;
 
   return {
-    users: paginatedUsers,
+    users,
     totalUsers,
     page,
     maxPage,

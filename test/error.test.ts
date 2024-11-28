@@ -4,6 +4,7 @@ import 'dotenv/config';
 import { connectDb, connectServer } from './util/connect.util';
 import { disconnectDb, disconnectServer } from './util/disconnect.util';
 import { createUser, deleteAll } from '../src/data/db/user';
+import { getToken } from './util/get-token.util';
 
 describe('createUser mutation error', () => {
   const port = process.env.PORT;
@@ -20,11 +21,7 @@ describe('createUser mutation error', () => {
               }
           `;
 
-  const headers = {
-    'Content-Type': 'application/json',
-    Authorization:
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTczMjA1ODQ1OSwiZXhwIjoxNzMyNjYzMjU5fQ.Nsg9qGnoVk78-6ghY59h70L3A1iLznZO_NpG0jOg3c0',
-  };
+  let token: string | undefined;
 
   const user = {
     data: {
@@ -39,6 +36,7 @@ describe('createUser mutation error', () => {
     await connectServer();
     await connectDb();
     await createUser(user);
+    token = await getToken(url);
   });
 
   after('End services', async () => {
@@ -48,6 +46,10 @@ describe('createUser mutation error', () => {
   });
 
   it('should return an error for existing email', async () => {
+    const headers = {
+      'Content-Type': 'application/json',
+      Authorization: token,
+    };
     const variables = {
       data: {
         name: 'Sam',
@@ -68,6 +70,10 @@ describe('createUser mutation error', () => {
   });
 
   it('should return an error for invalid password', async () => {
+    const headers = {
+      'Content-Type': 'application/json',
+      Authorization: token,
+    };
     const variables = {
       data: {
         name: 'Ben',
@@ -88,6 +94,10 @@ describe('createUser mutation error', () => {
   });
 
   it('should return an error for invalid input', async () => {
+    const headers = {
+      'Content-Type': 'application/json',
+      Authorization: token,
+    };
     const variables = {
       data: {
         name: '',
@@ -103,30 +113,7 @@ describe('createUser mutation error', () => {
     expect(graphqlError.code).to.equal('400');
     expect(graphqlError.additionalInfo).to.deep.equal({
       field: 'data',
-      reason: 'Name, email, password and birthDate are required!',
-    });
-  });
-
-  it('should return an error for no users', async () => {
-    await deleteAll();
-    const query = `
-            query users{
-              users {
-                id,
-                name,
-                birthDate,
-                email
-              }
-            }
-        `;
-
-    const response = await axios.post(url, { query });
-    const graphqlError = response.data.errors[0];
-    expect(graphqlError.message).to.equal('Users not found!');
-    expect(graphqlError.code).to.equal('404');
-    expect(graphqlError.additionalInfo).to.deep.equal({
-      field: 'User',
-      reason: 'There are no users.',
+      reason: 'Name, email, password and birth_date are required!',
     });
   });
 });

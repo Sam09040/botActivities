@@ -32,18 +32,18 @@ describe('login mutation', () => {
   });
 
   const mutation = `
-            mutation login ($data: LoginInput!) {
-                login (data: $data) {
-                    user {
-                        id,
-                        name,
-                        email,
-                        birthDate
-                    },
-                    token
-                }
-            }
-        `;
+    mutation login ($data: LoginInput!) {
+        login (data: $data) {
+            user {
+                id,
+                name,
+                email,
+                birthDate
+            },
+            token
+        }
+    }
+  `;
 
   it('should return an error for invalid email', async () => {
     const variables = {
@@ -109,7 +109,7 @@ describe('login mutation', () => {
     expect(isValid).to.have.property('userId').that.is.a('number');
     expect(isValid.userId).to.equal(user?.id);
     expect(isValid.iat).to.be.closeTo(expiration, 5000);
-    expect(login.user.name).to.equal('Sam');
-    expect(login.user.birthDate).to.equal('09-04-2004');
+    expect(login.user.name).to.equal(user?.name);
+    expect(login.user.birthDate).to.equal(user?.birthDate);
   });
 });

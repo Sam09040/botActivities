@@ -3,22 +3,23 @@ import axios from 'axios';
 import 'dotenv/config';
 import { connectDb, connectServer } from './util/connect.util';
 import { disconnectDb, disconnectServer } from './util/disconnect.util';
-import { deleteAll, findUserByEmail } from '../src/data/db/user';
+import { createUser, deleteAll, findUserByEmail } from '../src/data/db/user';
+import { getToken } from './util/get-token.util';
 
 const port = process.env.PORT;
 const url = `http://localhost:${port}/`;
 
-describe('createUser mutation', () => {
+describe('first tests', () => {
   const mutation = `
-            mutation createUser($data: UserInput!){
-                createUser(data: $data) {
-                    id,
-                    name,
-                    email,
-                    birthDate
-                }
-            }
-        `;
+    mutation createUser($data: UserInput!){
+      createUser(data: $data) {
+        id,
+        name,
+        email,
+        birthDate
+      }
+    }
+  `;
 
   before('before', async () => {
     await connectServer();
@@ -40,16 +41,16 @@ describe('createUser mutation', () => {
         birthDate: '09-04-2004',
       },
     };
-
+    await createUser(variables);
+    const token = await getToken(url);
     const headers = {
       'Content-Type': 'application/json',
-      Authorization:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTczMjA1ODQ1OSwiZXhwIjoxNzMyNjYzMjU5fQ.Nsg9qGnoVk78-6ghY59h70L3A1iLznZO_NpG0jOg3c0',
+      Authorization: token,
     };
+    await deleteAll();
 
     const response = await axios.post(url, { query: mutation, variables }, { headers });
     const { data } = response.data;
-
     expect(data).to.have.property('createUser');
     expect(data.createUser).to.have.property('id');
     expect(data.createUser.name).to.equal('Sam');

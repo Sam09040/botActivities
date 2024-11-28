@@ -6,31 +6,28 @@ import { disconnectServer, disconnectDb } from './util/disconnect.util';
 import { seedUsers } from '../snaplet/seed/define-seed';
 import { getSeedClient } from '../snaplet/seed/seed-client';
 import { resetDatabase } from '../snaplet/seed/reset-database';
+import { getToken } from './util/get-token.util';
 
 describe.only('users query', () => {
   const port = process.env.PORT;
   const url = `http://localhost:${port}/`;
   const query = `
-    query users($skip: Int, $limit: Int){
-        users(skip: $skip, limit: $limit) {
-            users{
-                id,
-                name,
-                email,
-                birthDate
-                },
-                totalUsers,
-                page,
-                maxPage
-            }
-        }
-    `;
-
-  const headers = {
-    'Content-Type': 'application/json',
-    Authorization:
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTczMjI4MDc0OSwiZXhwIjoxNzMyODg1NTQ5fQ.huFREPUElN4d9cajXPdngDqSrBDMNDFYvmOVKk9GAMI',
-  };
+  query users($skip: Int, $limit: Int){
+    users(skip: $skip, limit: $limit) {
+      users{
+        id,
+        name,
+        email,
+        birthDate
+        },
+        totalUsers,
+        page,
+        maxPage
+      }
+    }
+  `;
+  let token: string | undefined;
+  let headers = {};
 
   const user = {
     data: {
@@ -52,6 +49,7 @@ describe.only('users query', () => {
   });
   beforeEach('create main user', async () => {
     await createUser(user);
+    token = await getToken(url);
   });
   afterEach('refresh db', async () => {
     await resetDatabase(await getSeedClient(false));
@@ -73,7 +71,11 @@ describe.only('users query', () => {
     expect(data.errors[0].extensions.http_status).to.equal('400');
   });
 
-  it('should return user, maxPage, page and totalUsers with their values', async () => {
+  it('should return correct values when skip and limit are 0', async () => {
+    headers = {
+      'Content-Type': 'application/json',
+      Authorization: token,
+    };
     await seedUsers();
     const variables = {
       skip: 0,
@@ -84,44 +86,59 @@ describe.only('users query', () => {
     const data = response.data.data.users;
     expect(data).to.have.property('users');
     expect(data.users.length).to.equal(10);
-    expect(data.page).to.equal(0);
+    expect(data.users[4]).to.have.property('id');
+    expect(data.users[0]).to.have.property('name');
+    expect(data.users[1]).to.have.property('email');
+    expect(data.users[2]).to.have.property('birthDate');
+    expect(data.users[3]).to.not.have.property('password');
+    expect(data.page).to.equal(1);
     expect(data.maxPage).to.equal(5);
     expect(data.totalUsers).to.equal(51);
   });
 
-  it('should return correct values for page and users.length', async () => {
+  it('should return correct values when limit is bigger than users amount', async () => {
+    headers = {
+      'Content-Type': 'application/json',
+      Authorization: token,
+    };
     await seedUsers();
     const variables = {
       skip: 10,
-      limit: 8,
+      limit: 50,
     };
 
     const response = await axios.post(url, { query, variables }, { headers });
     const data = response.data.data.users;
-    expect(data).to.have.property('users');
-    expect(data.users.length).to.equal(8);
+    expect(data.users.length).to.equal(41);
+    expect(data.maxPage).to.equal(1);
     expect(data.page).to.equal(1);
-    expect(data.maxPage).to.equal(6);
-    expect(data.totalUsers).to.equal(51);
   });
 
-  it('should return correct values for totalUsers, page and maxPage', async () => {
+  it('should return correct values when skip is bigger than users amount', async () => {
+    headers = {
+      'Content-Type': 'application/json',
+      Authorization: token,
+    };
     await seedUsers(19);
     const variables = {
-      skip: 10,
-      limit: 0,
+      skip: 20,
+      limit: 5,
     };
 
     const response = await axios.post(url, { query, variables }, { headers });
     const data = response.data.data.users;
-    expect(data).to.have.property('users');
-    expect(data.users.length).to.equal(10);
-    expect(data.page).to.equal(1);
-    expect(data.maxPage).to.equal(2);
+    expect(data.users.length).to.equal(0);
+    expect(data.users).to.deep.equal([]);
     expect(data.totalUsers).to.equal(20);
+    expect(data.page).to.equal(4);
+    expect(data.maxPage).to.equal(4);
   });
 
   it('should return an error for no users', async () => {
+    headers = {
+      'Content-Type': 'application/json',
+      Authorization: token,
+    };
     await deleteAll();
     const variables = {
       skip: 0,
@@ -129,13 +146,10 @@ describe.only('users query', () => {
     };
 
     const response = await axios.post(url, { query, variables }, { headers });
-    const data = response.data;
-    expect(data).to.have.property('errors');
-    expect(data.errors[0].message).to.equal('No users found!');
-    expect(data.errors[0].code).to.equal('404');
-    expect(data.errors[0].additionalInfo).to.deep.equal({
-      field: 'User',
-      reason: 'There are no users.',
-    });
+    const data = response.data.data.users;
+    expect(data.users).to.deep.equal([]);
+    expect(data.totalUsers).to.equals(0);
+    expect(data.page).to.equals(1);
+    expect(data.maxPage).to.equals(0);
   });
 });
