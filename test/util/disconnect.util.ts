@@ -1,5 +1,5 @@
-import prisma from '../../src/app/client/client';
-import server from '../../src/app/graphql/server';
+import { dbClient } from '../../src/data/db/client';
+import { server } from '../../src/data/graphql/server';
 
 export const disconnectServer = async () => {
   if (server) {
@@ -9,8 +9,8 @@ export const disconnectServer = async () => {
 };
 
 export const disconnectDb = async () => {
-  if (prisma) {
-    await prisma.$disconnect();
+  if (dbClient) {
+    await dbClient.$disconnect();
     console.log('Database testdb disconnected');
   }
 };

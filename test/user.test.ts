@@ -1,45 +1,45 @@
-import { expect } from 'chai';
-import axios from 'axios';
-import { prisma } from '../src/app/client/client';
 import 'dotenv/config';
+import axios from 'axios';
+import { expect } from 'chai';
 import { connectServer, connectDb } from './util/connect.util';
 import { disconnectServer, disconnectDb } from './util/disconnect.util';
-import { createUser } from './util/create.util';
-
+import { createUser, deleteAll, findUserByEmail } from '../src/data/db/user';
+import { getToken } from './util/get-token.util';
+import { encryptPassword } from '../src/data/graphql/password';
 
 describe('user query', () => {
   const port = process.env.PORT;
   const url = `http://localhost:${port}/`;
   const query = `
-                query user($userId: Int!){
-                  user(id: $userId) {
-                    name,
-                    email,
-                    birthDate
-                  }
-                }
-              `;
+    query user($userId: Int!){
+      user(id: $userId) {
+        name,
+        email,
+        birthDate
+      }
+    }
+  `;
 
-  const user = {
-    data: {
-      name: 'Sam',
-      email: 'sam@example.com',
-      password: 'Sam123',
-      birthDate: '09-04-2004',
-    },
-  };
+  let token: string | undefined;
 
   before('Begin services', async () => {
+    const user = {
+      data: {
+        name: 'Sam',
+        email: 'sam@example.com',
+        password: await encryptPassword('Sam123'),
+        birthDate: '09-04-2004',
+      },
+    };
     await connectServer();
-    await createUser(user);
     await connectDb();
-  })
+    await createUser(user);
+  });
   after('End services', async () => {
     await disconnectServer();
-    await prisma.user.deleteMany();
+    deleteAll();
     await disconnectDb();
   });
-
 
   it('should return an error for no token', async () => {
     const variables = {
@@ -77,16 +77,15 @@ describe('user query', () => {
   });
 
   it('should return user', async () => {
-    const user = await prisma.user.findUnique({ where: { email: 'sam@example.com' } });
-
+    const user = await findUserByEmail('sam@example.com');
+    token = await getToken(url);
     const variables = {
       userId: user?.id,
     };
 
     const headers = {
       'Content-Type': 'application/json',
-      Authorization:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTczMjA1ODQ1OSwiZXhwIjoxNzMyNjYzMjU5fQ.Nsg9qGnoVk78-6ghY59h70L3A1iLznZO_NpG0jOg3c0',
+      Authorization: token,
     };
 
     const response = await axios.post(url, { query, variables }, { headers });

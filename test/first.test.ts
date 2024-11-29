@@ -1,64 +1,65 @@
 import { expect } from 'chai';
 import axios from 'axios';
-import prisma from '../src/app/client/client';
 import 'dotenv/config';
 import { connectDb, connectServer } from './util/connect.util';
 import { disconnectDb, disconnectServer } from './util/disconnect.util';
+import { createUser, deleteAll, findUserByEmail } from '../src/data/db/user';
+import { getToken } from './util/get-token.util';
+import { encryptPassword } from '../src/data/graphql/password';
+import { UserInput } from '../src/data/interfaces';
 
 const port = process.env.PORT;
 const url = `http://localhost:${port}/`;
 
-describe('createUser mutation', () => {
+describe('first tests', () => {
   const mutation = `
-            mutation createUser($data: UserInput!){
-                createUser(data: $data) {
-                    id,
-                    name,
-                    email,
-                    birthDate
-                }
-            }
-        `;
-
+    mutation createUser($data: UserInput!){
+      createUser(data: $data) {
+        id,
+        name,
+        email,
+        birthDate
+      }
+    }
+  `;
+  let variables: UserInput | undefined = { data: { name: '', email: '', birthDate: '', password: '' } };
   before('before', async () => {
+    variables = {
+      data: {
+        name: 'Sam',
+        email: 'sam@example.com',
+        password: await encryptPassword('Sam123'),
+        birthDate: '09-04-2004',
+      },
+    };
     await connectServer();
     await connectDb();
+    await createUser(variables);
   });
 
   after('after', async () => {
     await disconnectServer();
-    await prisma.user.deleteMany();
+    deleteAll();
     await disconnectDb();
   });
 
   it('should create an user successfully', async () => {
-    const variables = {
-      data: {
-        name: 'Sam',
-        email: 'sam@example.com',
-        password: 'Sam123',
-        birthDate: '09-04-2004',
-      },
-    };
-
+    const token = await getToken(url);
+    await deleteAll();
     const headers = {
       'Content-Type': 'application/json',
-      Authorization:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTczMjA1ODQ1OSwiZXhwIjoxNzMyNjYzMjU5fQ.Nsg9qGnoVk78-6ghY59h70L3A1iLznZO_NpG0jOg3c0',
+      Authorization: token,
     };
 
     const response = await axios.post(url, { query: mutation, variables }, { headers });
     const { data } = response.data;
-
     expect(data).to.have.property('createUser');
     expect(data.createUser).to.have.property('id');
     expect(data.createUser.name).to.equal('Sam');
     expect(data.createUser.email).to.equal('sam@example.com');
     expect(data.createUser.birthDate).to.equal('09-04-2004');
 
-    const userInDb = await prisma.user.findUnique({
-      where: { email: 'sam@example.com' },
-    });
+    const userInDb = await findUserByEmail('sam@example.com');
 
     expect(userInDb).to.not.equal(null);
     expect(userInDb?.name).to.equal('Sam');
@@ -74,7 +75,7 @@ describe('createUser mutation', () => {
       },
     };
 
-    const response = await axios.post(url, { query: mutation, variables },);
+    const response = await axios.post(url, { query: mutation, variables });
     const data = response.data;
     expect(data).to.have.property('errors');
     expect(data.errors[0].message).to.equal('Token is required for this operation!');
