@@ -1,4 +1,3 @@
-import { encryptPassword } from '../graphql/password';
 import { UserInput } from '../interfaces';
 import { dbClient } from './client';
 
@@ -8,7 +7,7 @@ export const createUser = async (user: UserInput) => {
     data: {
       name,
       email,
-      password: await encryptPassword(password),
+      password,
       birthDate,
     },
   });

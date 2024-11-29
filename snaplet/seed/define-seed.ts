@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import { findUserById } from '../../src/data/db/user';
 import { getSeedClient } from './seed-client';
 import { resetDatabase } from './reset-database';
+import { encryptPassword } from '../../src/data/graphql/password';
 
 export const seedUsers = async (length?: number) => {
     let existingUser: User | null;
@@ -14,12 +15,14 @@ export const seedUsers = async (length?: number) => {
     await resetDatabase(seed);
     
     if (existingUser) {
+        const { id, name, email, birthDate } = existingUser;
+        const password = await encryptPassword(existingUser.password);
         await seed.user((x) => x(1, {
-            id: existingUser.id,
-            name: existingUser.name,
-            email: existingUser.email,
-            password: existingUser.password,
-            birthDate: existingUser.birthDate,
+            id,
+            name,
+            email,
+            password,
+            birthDate,
         }));
     }
 

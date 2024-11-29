@@ -17,8 +17,8 @@ export const loginMutation = async ({ data }: LoginInput) => {
   const user = await findUserByEmail(email);
 
   if (!user) {
-    throw new CustomError('404', 'Wrong email or password!', {
-      field: 'email',
+    throw new CustomError('400', 'Wrong email or password!', {
+      field: 'email or password',
       reason: 'The email or password is incorrect.',
     });
   }
@@ -26,7 +26,7 @@ export const loginMutation = async ({ data }: LoginInput) => {
   const isValid = await comparePassword(password, user.password);
   if (!isValid) {
     throw new CustomError('400', 'Wrong email or password.', {
-      field: 'password',
+      field: 'email or password',
       reason: 'The email or password is incorrect.',
     });
   }

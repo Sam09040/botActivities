@@ -5,6 +5,7 @@ import { connectServer, connectDb } from './util/connect.util';
 import { disconnectServer, disconnectDb } from './util/disconnect.util';
 import { createUser, deleteAll, findUserByEmail } from '../src/data/db/user';
 import { getToken } from './util/get-token.util';
+import { encryptPassword } from '../src/data/graphql/password';
 
 describe('user query', () => {
   const port = process.env.PORT;
@@ -21,16 +22,15 @@ describe('user query', () => {
 
   let token: string | undefined;
 
-  const user = {
-    data: {
-      name: 'Sam',
-      email: 'sam@example.com',
-      password: 'Sam123',
-      birthDate: '09-04-2004',
-    },
-  };
-
   before('Begin services', async () => {
+    const user = {
+      data: {
+        name: 'Sam',
+        email: 'sam@example.com',
+        password: await encryptPassword('Sam123'),
+        birthDate: '09-04-2004',
+      },
+    };
     await connectServer();
     await connectDb();
     await createUser(user);

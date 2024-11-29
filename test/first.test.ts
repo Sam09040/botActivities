@@ -5,6 +5,8 @@ import { connectDb, connectServer } from './util/connect.util';
 import { disconnectDb, disconnectServer } from './util/disconnect.util';
 import { createUser, deleteAll, findUserByEmail } from '../src/data/db/user';
 import { getToken } from './util/get-token.util';
+import { encryptPassword } from '../src/data/graphql/password';
+import { UserInput } from '../src/data/interfaces';
 
 const port = process.env.PORT;
 const url = `http://localhost:${port}/`;
@@ -20,10 +22,19 @@ describe('first tests', () => {
       }
     }
   `;
-
+  let variables: UserInput | undefined = { data: { name: '', email: '', birthDate: '', password: '' } };
   before('before', async () => {
+    variables = {
+      data: {
+        name: 'Sam',
+        email: 'sam@example.com',
+        password: await encryptPassword('Sam123'),
+        birthDate: '09-04-2004',
+      },
+    };
     await connectServer();
     await connectDb();
+    await createUser(variables);
   });
 
   after('after', async () => {
@@ -33,21 +44,12 @@ describe('first tests', () => {
   });
 
   it('should create an user successfully', async () => {
-    const variables = {
-      data: {
-        name: 'Sam',
-        email: 'sam@example.com',
-        password: 'Sam123',
-        birthDate: '09-04-2004',
-      },
-    };
-    await createUser(variables);
     const token = await getToken(url);
+    await deleteAll();
     const headers = {
       'Content-Type': 'application/json',
       Authorization: token,
     };
-    await deleteAll();
 
     const response = await axios.post(url, { query: mutation, variables }, { headers });
     const { data } = response.data;

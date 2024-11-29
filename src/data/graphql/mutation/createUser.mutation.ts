@@ -3,7 +3,7 @@ import { createUser, findUserByEmail } from '../../db/user';
 import { verifyToken } from '../../validation/validation';
 import { CustomError } from '../../errors/CustomError';
 import { User, UserInput } from '../../interfaces';
-import { isPasswordValid } from '../password';
+import { encryptPassword, isPasswordValid } from '../password';
 
 export const createUserMutation = async ({ data }: UserInput, token: string | undefined): Promise<User> => {
   const { name, email, password, birthDate } = data;
@@ -21,7 +21,7 @@ export const createUserMutation = async ({ data }: UserInput, token: string | un
   if (!name || !email || !password || !birthDate) {
     throw new CustomError('400', 'Invalid input!', {
       field: 'data',
-      reason: 'Name, email, password and birth_date are required!',
+      reason: 'Name, email, password and birthDate are required!',
     });
   }
 
@@ -45,7 +45,7 @@ export const createUserMutation = async ({ data }: UserInput, token: string | un
     data: {
       name,
       email,
-      password,
+      password: await encryptPassword(password),
       birthDate,
     },
   };

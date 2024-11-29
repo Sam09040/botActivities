@@ -5,6 +5,7 @@ import { connectDb, connectServer } from './util/connect.util';
 import { disconnectDb, disconnectServer } from './util/disconnect.util';
 import { createUser, deleteAll } from '../src/data/db/user';
 import { getToken } from './util/get-token.util';
+import { encryptPassword } from '../src/data/graphql/password';
 
 describe('createUser mutation error', () => {
   const port = process.env.PORT;
@@ -23,16 +24,15 @@ describe('createUser mutation error', () => {
 
   let token: string | undefined;
 
-  const user = {
-    data: {
-      name: 'Sam',
-      email: 'sam@example.com',
-      password: 'Sam123',
-      birthDate: '09-04-2004',
-    },
-  };
-
   before('Begin services', async () => {
+    const user = {
+      data: {
+        name: 'Sam',
+        email: 'sam@example.com',
+        password: await encryptPassword('Sam123'),
+        birthDate: '09-04-2004',
+      },
+    };
     await connectServer();
     await connectDb();
     await createUser(user);
@@ -113,7 +113,7 @@ describe('createUser mutation error', () => {
     expect(graphqlError.code).to.equal('400');
     expect(graphqlError.additionalInfo).to.deep.equal({
       field: 'data',
-      reason: 'Name, email, password and birth_date are required!',
+      reason: 'Name, email, password and birthDate are required!',
     });
   });
 });

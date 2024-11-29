@@ -7,8 +7,9 @@ import { seedUsers } from '../snaplet/seed/define-seed';
 import { getSeedClient } from '../snaplet/seed/seed-client';
 import { resetDatabase } from '../snaplet/seed/reset-database';
 import { getToken } from './util/get-token.util';
+import { encryptPassword } from '../src/data/graphql/password';
 
-describe.only('users query', () => {
+describe('users query', () => {
   const port = process.env.PORT;
   const url = `http://localhost:${port}/`;
   const query = `
@@ -29,15 +30,6 @@ describe.only('users query', () => {
   let token: string | undefined;
   let headers = {};
 
-  const user = {
-    data: {
-      name: 'Sam',
-      email: 'sam@example.com',
-      password: 'Sam123',
-      birthDate: '09-04-2004',
-    },
-  };
-
   before('begin services', async () => {
     await connectServer();
     await connectDb();
@@ -48,6 +40,14 @@ describe.only('users query', () => {
     await disconnectDb();
   });
   beforeEach('create main user', async () => {
+    const user = {
+      data: {
+        name: 'Sam',
+        email: 'sam@example.com',
+        password: await encryptPassword('Sam123'),
+        birthDate: '09-04-2004',
+      },
+    };
     await createUser(user);
     token = await getToken(url);
   });

@@ -5,21 +5,21 @@ import { connectServer, connectDb } from './util/connect.util';
 import { disconnectServer, disconnectDb } from './util/disconnect.util';
 import { createUser, deleteAll, findUserByEmail } from '../src/data/db/user';
 import { verifyToken } from '../src/data/validation/validation';
+import { encryptPassword } from '../src/data/graphql/password';
 
 describe('login mutation', () => {
   const port = process.env.PORT;
   const url = `http://localhost:${port}/`;
 
-  const user = {
-    data: {
-      name: 'Sam',
-      email: 'sam@example.com',
-      password: 'Sam123',
-      birthDate: '09-04-2004',
-    },
-  };
-
   before('Begin services', async () => {
+    const user = {
+      data: {
+        name: 'Sam',
+        email: 'sam@example.com',
+        password: await encryptPassword('Sam123'),
+        birthDate: '09-04-2004',
+      },
+    };
     await connectServer();
     await createUser(user);
     await connectDb();
@@ -58,11 +58,11 @@ describe('login mutation', () => {
       await axios.post(url, { query: mutation, variables });
     } catch (err) {
       const graphqlError = err.response.data.errors[0];
-      expect(graphqlError.message).to.equal('User not found!');
-      expect(graphqlError.extensions.code).to.equal('404');
+      expect(graphqlError.message).to.equal('Wrong email or password');
+      expect(graphqlError.extensions.code).to.equal('400');
       expect(graphqlError.extensions.additionalInfo).to.deep.equal({
-        field: 'email',
-        reason: 'The email you provided does not exist.',
+        field: 'email or password',
+        reason: 'The email or password is incorrect.',
       });
     }
   });
@@ -80,11 +80,11 @@ describe('login mutation', () => {
       await axios.post(url, { query: mutation, variables });
     } catch (err) {
       const graphqlError = err.response.data.errors[0];
-      expect(graphqlError.message).to.equal('Wrong password.');
+      expect(graphqlError.message).to.equal('Wrong email or password.');
       expect(graphqlError.extensions.code).to.equal('400');
       expect(graphqlError.extensions.additionalInfo).to.deep.equal({
-        field: 'password',
-        reason: 'The provided password does not match.',
+        field: 'email or password',
+        reason: 'The email or password is incorrect.',
       });
     }
   });
