@@ -1,5 +1,5 @@
 import { AuthenticationError } from 'apollo-server';
-import { dbClient } from '../../db/client';
+import { dbClient } from '../../db/config/db.client';
 import { verifyToken } from '../../validation/validation';
 
 export const usersQuery = async (skip: number | undefined, limit: number | undefined, token: string | undefined) => {

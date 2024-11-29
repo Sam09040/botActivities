@@ -1,4 +1,4 @@
-import { dbClient } from '../../src/data/db/client';
+import { dbClient } from '../../src/data/db/config/db.client';
 import { server } from '../../src/data/graphql/server';
 
 export const disconnectServer = async () => {

@@ -3,9 +3,9 @@ import axios from 'axios';
 import { expect } from 'chai';
 import { connectServer, connectDb } from './util/connect.util';
 import { disconnectServer, disconnectDb } from './util/disconnect.util';
-import { createUser, deleteAll, findUserByEmail } from '../src/data/db/user';
 import { getToken } from './util/get-token.util';
 import { encryptPassword } from '../src/data/graphql/password';
+import { createUser, deleteAllUsers, findUserByEmail } from '../src/data/user/user.db.datasource';
 
 describe('user query', () => {
   const port = process.env.PORT;
@@ -37,7 +37,7 @@ describe('user query', () => {
   });
   after('End services', async () => {
     await disconnectServer();
-    deleteAll();
+    deleteAllUsers();
     await disconnectDb();
   });
 

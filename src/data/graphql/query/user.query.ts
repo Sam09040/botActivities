@@ -1,8 +1,8 @@
 import { AuthenticationError } from 'apollo-server';
-import { findUserById } from '../../db/user';
 import { verifyToken } from '../../validation/validation';
 import { CustomError } from '../../errors/CustomError';
 import 'dotenv/config';
+import { findUserById } from '../../user/user.db.datasource';
 
 export const userQuery = (id: number, token: string | undefined) => {
   if (!token) {

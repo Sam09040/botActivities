@@ -3,10 +3,10 @@ import axios from 'axios';
 import 'dotenv/config';
 import { connectDb, connectServer } from './util/connect.util';
 import { disconnectDb, disconnectServer } from './util/disconnect.util';
-import { createUser, deleteAll, findUserByEmail } from '../src/data/db/user';
 import { getToken } from './util/get-token.util';
 import { encryptPassword } from '../src/data/graphql/password';
 import { UserInput } from '../src/data/interfaces';
+import { createUser, deleteAllUsers, findUserByEmail } from '../src/data/user/user.db.datasource';
 
 const port = process.env.PORT;
 const url = `http://localhost:${port}/`;
@@ -39,13 +39,13 @@ describe('first tests', () => {
 
   after('after', async () => {
     await disconnectServer();
-    deleteAll();
+    deleteAllUsers();
     await disconnectDb();
   });
 
   it('should create an user successfully', async () => {
     const token = await getToken(url);
-    await deleteAll();
+    await deleteAllUsers();
     const headers = {
       'Content-Type': 'application/json',
       Authorization: token,

@@ -3,9 +3,9 @@ import axios from 'axios';
 import 'dotenv/config';
 import { connectDb, connectServer } from './util/connect.util';
 import { disconnectDb, disconnectServer } from './util/disconnect.util';
-import { createUser, deleteAll } from '../src/data/db/user';
 import { getToken } from './util/get-token.util';
 import { encryptPassword } from '../src/data/graphql/password';
+import { createUser, deleteAllUsers } from '../src/data/user/user.db.datasource';
 
 describe('createUser mutation error', () => {
   const port = process.env.PORT;
@@ -41,7 +41,7 @@ describe('createUser mutation error', () => {
 
   after('End services', async () => {
     await disconnectServer();
-    deleteAll();
+    deleteAllUsers();
     await disconnectDb();
   });
 

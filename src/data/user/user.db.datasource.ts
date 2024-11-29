@@ -1,5 +1,5 @@
+import { dbClient } from '../db/config/db.client';
 import { UserInput } from '../interfaces';
-import { dbClient } from './client';
 
 export const createUser = async (user: UserInput) => {
   const { name, email, password, birthDate } = user.data;
@@ -25,6 +25,6 @@ export const findUserByEmail = (email: string) => {
   return dbClient.user.findUnique({ where: { email } });
 };
 
-export const deleteAll = () => {
+export const deleteAllUsers = () => {
   return dbClient.user.deleteMany();
 };

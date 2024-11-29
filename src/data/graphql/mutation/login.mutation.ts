@@ -1,8 +1,8 @@
-import { findUserByEmail } from '../../db/user';
 import { CustomError } from '../../errors/CustomError';
 import { LoginInput } from '../../interfaces';
 import { comparePassword } from '../password';
 import { createToken } from '../../validation/token';
+import { findUserByEmail } from '../../user/user.db.datasource';
 
 export const loginMutation = async ({ data }: LoginInput) => {
   const { email, password, rememberMe } = data;

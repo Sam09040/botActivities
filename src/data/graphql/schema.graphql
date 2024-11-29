@@ -1,19 +1,32 @@
-type Query{
+type Query {
+    address(userId: Int!): [Address],
     users(skip: Int, limit: Int): UsersPayload,
     user(id: Int!): User,
     hello: String
 }
 
-type Mutation{
+type Mutation {
     createUser(data: UserInput!): User!,
+    createAddress(userId: Int!, data: AddressInput!): Address!,
     login(data: LoginInput!): AuthPayload!
 }
 
-type User{
+type User {
     id: ID!
     name: String!
     email: String!
     birthDate: String!
+}
+
+type Address {
+    id: ID!
+    cep: String!
+    street: String!
+    streetNumber: String!
+    complement: String
+    neighborhood: String!
+    city: String!
+    state: String!
 }
 
 type AuthPayload {
@@ -28,15 +41,25 @@ type UsersPayload {
     maxPage: Int
 }
 
-input UserInput{
+input UserInput {
     name: String!
     email: String!
     password: String!
     birthDate: String!
 }
 
-input LoginInput{
+input LoginInput {
     email: String!
     password: String!
     rememberMe: Boolean!
+}
+
+input AddressInput {
+    cep: String!
+    street: String!
+    streetNumber: String!
+    complement: String
+    neighborhood: String!
+    city: String!
+    state: String!
 }

@@ -1,10 +1,12 @@
-import { UserInput, LoginInput, User } from '../interfaces';
+import { UserInput, LoginInput, User, Address } from '../interfaces';
 import { ContextType } from './context-type';
 import 'dotenv/config';
 import { userQuery } from './query/user.query';
-import { createUserMutation } from './mutation/createUser.mutation';
+import { createUserMutation } from './mutation/create-user.mutation';
 import { loginMutation } from './mutation/login.mutation';
 import { usersQuery } from './query/users.query';
+import { createAddressMutation } from './mutation/create-address.mutation';
+import { addressQuery } from './query/address.query';
 
 export const resolvers = {
   Query: {
@@ -13,22 +15,15 @@ export const resolvers = {
       _: unknown,
       { skip, limit }: { skip: number | undefined; limit: number | undefined },
       context: ContextType,
-    ) => {
-      const { token } = context;
-      return usersQuery(skip, limit, token);
-    },
-    user: async (_: unknown, { id }: { id: number }, context: ContextType) => {
-      const { token } = context;
-      return userQuery(id, token);
-    },
+    ) => usersQuery(skip, limit, context.token),
+    user: async (_: unknown, { id }: { id: number }, context: ContextType) => userQuery(id, context.token),
+    address: async (_: unknown, { userId }: { userId: number }) => addressQuery(userId),
   },
   Mutation: {
-    createUser: async (_: unknown, data: UserInput, context: ContextType): Promise<User> => {
-      const { token } = context;
-      return createUserMutation(data, token);
-    },
-    login: async (_: unknown, data: LoginInput) => {
-      return loginMutation(data);
-    },
+    createUser: async (_: unknown, data: UserInput, context: ContextType): Promise<User> =>
+      createUserMutation(data, context.token),
+    createAddress: async (_: unknown, { userId, data }: { userId: number; data: Address }) =>
+      createAddressMutation(userId, data),
+    login: async (_: unknown, data: LoginInput) => loginMutation(data),
   },
 };

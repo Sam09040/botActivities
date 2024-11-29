@@ -2,16 +2,16 @@
 import { User } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 import { format } from 'date-fns';
-import { findUserById } from '../../src/data/db/user';
 import { getSeedClient } from './seed-client';
 import { resetDatabase } from './reset-database';
 import { encryptPassword } from '../../src/data/graphql/password';
+import { findUserById } from '../../src/data/user/user.db.datasource';
 
 export const seedUsers = async (length?: number) => {
     let existingUser: User | null;
     existingUser = await findUserById(1);
 
-    const seed = await getSeedClient(false);
+    const seed = await getSeedClient();
     await resetDatabase(seed);
     
     if (existingUser) {
