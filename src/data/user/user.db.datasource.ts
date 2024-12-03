@@ -13,8 +13,22 @@ export const createUser = async (user: UserInput) => {
   });
 };
 
-export const findAllUsers = () => {
-  return dbClient.user.findMany();
+export const countUsers = () => {
+  return dbClient.user.count();
+};
+
+export const findAllUsers = (skip?: number, limit?: number) => {
+  if (!limit) {
+    limit = 10;
+  }
+
+  return dbClient.user.findMany({
+    skip,
+    take: limit,
+    orderBy: {
+      name: 'asc',
+    },
+  });
 };
 
 export const findUserById = (id: number) => {

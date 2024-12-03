@@ -3,13 +3,15 @@ import { encryptPassword } from '../src/data/graphql/password';
 import { connectDb, connectServer } from './util/connect.util';
 import { disconnectServer, disconnectDb } from './util/disconnect.util';
 import { expect } from 'chai';
-import { createUser, findUserByEmail, deleteAllUsers } from '../src/data/user/user.db.datasource';
-import { deleteAllAddresses, getUserAddresses, createAddress } from '../src/data/address/address.db.datasource';
+import { createUser } from '../src/data/user/user.db.datasource';
+import { getUserAddresses, createAddress } from '../src/data/address/address.db.datasource';
+import { resetDatabase } from '../snaplet/seed/reset-database';
+import { getSeedClient } from '../snaplet/seed/seed-client';
 
 const port = process.env.PORT;
 const url = `http://localhost:${port}/`;
 
-describe.only('address testes', () => {
+describe('address testes', () => {
   const mutation = `
         mutation createAddress($userId: Int!, $data: AddressInput!){
             createAddress(userId: $userId, data: $data) {
@@ -28,6 +30,17 @@ describe.only('address testes', () => {
   let userId: number;
 
   before('before', async () => {
+    await connectServer();
+    await connectDb();
+    
+  });
+
+  after('after', async () => {
+    await disconnectServer();
+    await disconnectDb();
+  });
+
+  beforeEach('beforeEach', async () => {
     const user = {
       data: {
         name: 'Sam',
@@ -36,20 +49,14 @@ describe.only('address testes', () => {
         birthDate: '09-04-2004',
       },
     };
-    await connectServer();
-    await connectDb();
-    await createUser(user);
-    const sam = await findUserByEmail('sam@example.com');
+    const sam = await createUser(user);
     if (sam) {
       userId = sam.id;
     }
   });
 
-  after('after', async () => {
-    await disconnectServer();
-    await deleteAllAddresses();
-    await deleteAllUsers();
-    await disconnectDb();
+  afterEach('after each', async () => {
+    await resetDatabase(await getSeedClient());
   });
 
   it('should return error for userId not provided', async () => {
@@ -104,7 +111,7 @@ describe.only('address testes', () => {
 
   it('should return error for missing field', async () => {
     const variables = {
-      userId: userId,
+      userId,
       data: {
         cep: '41650-195',
         street: '',
@@ -127,9 +134,9 @@ describe.only('address testes', () => {
     });
   });
 
-  it.only('should return success and show address', async () => {
+  it('should return success and show address', async () => {
     const variables = {
-      userId: userId,
+      userId,
       data: {
         cep: '41650-195',
         street: 'R. da Gratidão',
@@ -154,9 +161,19 @@ describe.only('address testes', () => {
     expect(res.state).to.equal(address[0].state);
   });
 
-  it.only('should return 2 addresses', async () => {
+  it('should return 2 addresses', async () => {
+    const data = {
+      cep: '41650-195',
+      street: 'R. da Gratidão',
+      streetNumber: '290F',
+      complement: 'T. turquesa, apt 302',
+      neighborhood: 'Piatã',
+      city: 'Salvador',
+      state: 'Bahia',
+    };
+
     const variables = {
-      userId: userId,
+      userId,
       data: {
         id: 0,
         userId: 0,
@@ -185,12 +202,13 @@ describe.only('address testes', () => {
         }
     `;
 
+    await createAddress(variables.userId, data);
     await createAddress(variables.userId, variables.data);
 
     const response = await axios.post(url, { query, variables: { userId } });
     const res = response.data.data;
     expect(res.address.length).to.equal(2);
     expect(res.address[1].street).to.equal('R. Existe');
-    expect(res.address[1].streetNumber).to.equal('123')
+    expect(res.address[1].streetNumber).to.equal('123');
   });
 });
