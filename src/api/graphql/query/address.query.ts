@@ -1,7 +1,7 @@
 import { Address } from '@prisma/client';
-import { CustomError } from '../../errors/CustomError';
-import { getUserAddresses } from '../../address/address.db.datasource';
-import { findUserById } from '../../user/user.db.datasource';
+import { CustomError } from '../../../core/errors/CustomError';
+import { getAddresses } from '../../../data/address/address.db.datasource';
+import { findUserById } from '../../../data/user/user.db.datasource';
 
 export const addressQuery = async (userId: number): Promise<Address[]> => {
   if (!userId) {
@@ -20,6 +20,6 @@ export const addressQuery = async (userId: number): Promise<Address[]> => {
     });
   }
 
-  const addresses = await getUserAddresses(userId);
+  const addresses = await getAddresses(userId);
   return addresses;
 };

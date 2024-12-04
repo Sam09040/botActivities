@@ -2,12 +2,12 @@ import axios from 'axios';
 import { expect } from 'chai';
 import { connectServer, connectDb } from './util/connect.util';
 import { disconnectServer, disconnectDb } from './util/disconnect.util';
-import { seedUsers } from '../snaplet/seed/define-seed';
-import { getSeedClient } from '../snaplet/seed/seed-client';
-import { resetDatabase } from '../snaplet/seed/reset-database';
 import { getToken } from './util/get-token.util';
-import { encryptPassword } from '../src/data/graphql/password';
+import { encryptPassword } from '../src/core/security/password';
 import { deleteAllUsers, createUser } from '../src/data/user/user.db.datasource';
+import { resetDatabase } from '../snaplet/seed/reset-database';
+import { getSeedClient } from '../snaplet/seed/seed-client';
+import { seedDb } from '../snaplet/seed/define-seed';
 
 describe('users query', () => {
   const port = process.env.PORT;
@@ -20,6 +20,16 @@ describe('users query', () => {
         name,
         email,
         birthDate
+        addresses {
+          id
+          cep
+          street
+          streetNumber
+          complement
+          neighborhood
+          city
+          state
+        }
         },
         totalUsers,
         page,
@@ -35,8 +45,8 @@ describe('users query', () => {
     await connectDb();
   });
   after('end services', async () => {
+    await resetDatabase(await getSeedClient());
     await disconnectServer();
-    deleteAllUsers();
     await disconnectDb();
   });
   beforeEach('create main user', async () => {
@@ -76,7 +86,7 @@ describe('users query', () => {
       'Content-Type': 'application/json',
       Authorization: token,
     };
-    await seedUsers();
+    await seedDb();
     const variables = {
       skip: 0,
       limit: 0,
@@ -90,6 +100,7 @@ describe('users query', () => {
     expect(data.users[0]).to.have.property('name');
     expect(data.users[1]).to.have.property('email');
     expect(data.users[2]).to.have.property('birthDate');
+    expect(data.users[5]).to.have.property('addresses');
     expect(data.users[3]).to.not.have.property('password');
     expect(data.page).to.equal(1);
     expect(data.maxPage).to.equal(5);
@@ -101,7 +112,7 @@ describe('users query', () => {
       'Content-Type': 'application/json',
       Authorization: token,
     };
-    await seedUsers();
+    await seedDb();
     const variables = {
       skip: 10,
       limit: 50,
@@ -119,7 +130,7 @@ describe('users query', () => {
       'Content-Type': 'application/json',
       Authorization: token,
     };
-    await seedUsers(19);
+    await seedDb(19);
     const variables = {
       skip: 20,
       limit: 5,
@@ -132,6 +143,30 @@ describe('users query', () => {
     expect(data.totalUsers).to.equal(20);
     expect(data.page).to.equal(4);
     expect(data.maxPage).to.equal(4);
+  });
+
+  it('should return users with addresses', async () => {
+    headers = {
+      'Content-Type': 'application/json',
+      Authorization: token,
+    };
+    await seedDb();
+    const variables = {
+      skip: 0,
+      limit: 0,
+    };
+
+    const response = await axios.post(url, { query, variables }, { headers });
+    const data = response.data.data.users.users;
+    expect(data[1]).to.have.property('addresses');
+    expect(data[1].addresses[0]).to.have.property('id');
+    expect(data[1].addresses[0]).to.have.property('cep');
+    expect(data[1].addresses[0]).to.have.property('street');
+    expect(data[1].addresses[0]).to.have.property('streetNumber');
+    expect(data[1].addresses[0]).to.have.property('complement');
+    expect(data[1].addresses[0]).to.have.property('neighborhood');
+    expect(data[1].addresses[0]).to.have.property('city');
+    expect(data[1].addresses[0]).to.have.property('state');
   });
 
   it('should return an error for no users', async () => {

@@ -1,2 +1,2 @@
-import { seedUsers } from "./define-seed";
-seedUsers();
+import { seedDb } from './define-seed';
+seedDb();

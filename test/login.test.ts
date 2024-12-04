@@ -1,10 +1,10 @@
-import { expect } from 'chai';
 import axios from 'axios';
 import 'dotenv/config';
+import { expect } from 'chai';
 import { connectServer, connectDb } from './util/connect.util';
 import { disconnectServer, disconnectDb } from './util/disconnect.util';
-import { verifyToken } from '../src/data/validation/validation';
-import { encryptPassword } from '../src/data/graphql/password';
+import { verifyToken } from '../src/core/security/validation/validation';
+import { encryptPassword } from '../src/core/security/password';
 import { createUser, deleteAllUsers, findUserByEmail } from '../src/data/user/user.db.datasource';
 
 describe('login mutation', () => {

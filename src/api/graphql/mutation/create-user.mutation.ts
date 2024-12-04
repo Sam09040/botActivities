@@ -1,9 +1,9 @@
 import { AuthenticationError } from 'apollo-server';
-import { verifyToken } from '../../validation/validation';
-import { CustomError } from '../../errors/CustomError';
-import { User, UserInput } from '../../interfaces';
-import { encryptPassword, isPasswordValid } from '../password';
-import { createUser, findUserByEmail } from '../../user/user.db.datasource';
+import { encryptPassword, isPasswordValid } from '../../../core/security/password';
+import { CustomError } from '../../../core/errors/CustomError';
+import { verifyToken } from '../../../core/security/validation/validation';
+import { findUserByEmail, createUser } from '../../../data/user/user.db.datasource';
+import { User, UserInput } from '../../../domain/interfaces';
 
 export const createUserMutation = async ({ data }: UserInput, token: string | undefined): Promise<User> => {
   const { name, email, password, birthDate } = data;

@@ -4,8 +4,8 @@ import 'dotenv/config';
 import { connectDb, connectServer } from './util/connect.util';
 import { disconnectDb, disconnectServer } from './util/disconnect.util';
 import { getToken } from './util/get-token.util';
-import { encryptPassword } from '../src/data/graphql/password';
-import { UserInput } from '../src/data/interfaces';
+import { encryptPassword } from '../src/core/security/password';
+import { UserInput } from '../src/domain/interfaces';
 import { createUser, deleteAllUsers, findUserByEmail } from '../src/data/user/user.db.datasource';
 
 const port = process.env.PORT;

@@ -4,8 +4,12 @@ import { expect } from 'chai';
 import { connectServer, connectDb } from './util/connect.util';
 import { disconnectServer, disconnectDb } from './util/disconnect.util';
 import { getToken } from './util/get-token.util';
-import { encryptPassword } from '../src/data/graphql/password';
-import { createUser, deleteAllUsers, findUserByEmail } from '../src/data/user/user.db.datasource';
+import { encryptPassword } from '../src/core/security/password';
+import { createUser, deleteAllUsers } from '../src/data/user/user.db.datasource';
+import { createAddress } from '../src/data/address/address.db.datasource';
+import { User } from '@prisma/client';
+import { resetDatabase } from '../snaplet/seed/reset-database';
+import { getSeedClient } from '../snaplet/seed/seed-client';
 
 describe('user query', () => {
   const port = process.env.PORT;
@@ -21,9 +25,18 @@ describe('user query', () => {
   `;
 
   let token: string | undefined;
-
+  let user: User;
   before('Begin services', async () => {
-    const user = {
+    await connectServer();
+    await connectDb();
+  });
+  after('End services', async () => {
+    await disconnectServer();
+    await resetDatabase(await getSeedClient());
+    await disconnectDb();
+  });
+  beforeEach('before each', async () => {
+    const userInfo = {
       data: {
         name: 'Sam',
         email: 'sam@example.com',
@@ -31,14 +44,10 @@ describe('user query', () => {
         birthDate: '09-04-2004',
       },
     };
-    await connectServer();
-    await connectDb();
-    await createUser(user);
+    user = await createUser(userInfo);
   });
-  after('End services', async () => {
-    await disconnectServer();
-    deleteAllUsers();
-    await disconnectDb();
+  afterEach('after each', async () => {
+    await deleteAllUsers();
   });
 
   it('should return an error for no token', async () => {
@@ -77,10 +86,9 @@ describe('user query', () => {
   });
 
   it('should return user', async () => {
-    const user = await findUserByEmail('sam@example.com');
     token = await getToken(url);
     const variables = {
-      userId: user?.id,
+      userId: user.id,
     };
 
     const headers = {
@@ -94,5 +102,65 @@ describe('user query', () => {
     expect(data.user.name).to.equal('Sam');
     expect(data.user.email).to.equal('sam@example.com');
     expect(data.user.birthDate).to.equal('09-04-2004');
+  });
+
+  it('should return user and address', async () => {
+    const query = `
+    query user($userId: Int!) {
+      user(id: $userId) {
+        name,
+        email,
+        birthDate
+        addresses {
+          id
+          cep
+          street
+          streetNumber
+          complement
+          neighborhood
+          city
+          state
+        }
+      }
+    }
+  `;
+
+    const addressInfo = {
+      userId: user.id,
+      data: {
+        cep: '12345-678',
+        street: 'R. Existe',
+        streetNumber: '123A',
+        complement: 'T. Silveira, apt. 512',
+        neighborhood: 'Bairro',
+        city: 'Cidade',
+        state: 'Estado',
+      },
+    };
+    const address = await createAddress(addressInfo.userId, addressInfo.data);
+    token = await getToken(url);
+    const variables = {
+      userId: user.id,
+    };
+
+    const headers = {
+      'Content-Type': 'application/json',
+      Authorization: token,
+    };
+
+    const response = await axios.post(url, { query, variables }, { headers });
+    const data = response.data.data;
+    expect(data.user.name).to.equal('Sam');
+    expect(data.user.email).to.equal('sam@example.com');
+    expect(data.user.birthDate).to.equal('09-04-2004');
+    expect(data.user).to.have.property('addresses');
+    expect(data.user.addresses[0].id).to.equal(address.id.toString());
+    expect(data.user.addresses[0].cep).to.equal(address.cep);
+    expect(data.user.addresses[0].street).to.equal(address.street);
+    expect(data.user.addresses[0].streetNumber).to.equal(address.streetNumber);
+    expect(data.user.addresses[0].complement).to.equal(address.complement);
+    expect(data.user.addresses[0].neighborhood).to.equal(address.neighborhood);
+    expect(data.user.addresses[0].city).to.equal(address.city);
+    expect(data.user.addresses[0].state).to.equal(address.state);
   });
 });

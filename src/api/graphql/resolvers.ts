@@ -1,4 +1,4 @@
-import { UserInput, LoginInput, User, Address } from '../interfaces';
+import { UserInput, LoginInput, User, Address } from '../../domain/interfaces';
 import { ContextType } from './context-type';
 import 'dotenv/config';
 import { userQuery } from './query/user.query';

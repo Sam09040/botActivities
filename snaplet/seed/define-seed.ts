@@ -3,11 +3,13 @@ import { faker } from '@faker-js/faker';
 import { format } from 'date-fns';
 import { getSeedClient } from './seed-client';
 import { resetDatabase } from './reset-database';
-import { encryptPassword } from '../../src/data/graphql/password';
-import { findUserById } from '../../src/data/user/user.db.datasource';
+import { encryptPassword } from '../../src/core/security/password';
+import { findUserByEmail, updateUserAddress } from '../../src/data/user/user.db.datasource';
+import { getAddresses } from '../../src/data/address/address.db.datasource';
 
-export const seedUsers = async (length?: number) => {
-  const existingUser: User | null = await findUserById(1);
+export const seedDb = async (length?: number) => {
+  const existingUser: User | null = await findUserByEmail('sam@example.com');
+  const existingAddresses = await getAddresses(existingUser?.id);
 
   const seed = await getSeedClient();
   await resetDatabase(seed);
@@ -24,6 +26,23 @@ export const seedUsers = async (length?: number) => {
         birthDate,
       }),
     );
+    existingAddresses.forEach(async (address) => {
+      const { id, userId, cep, street, streetNumber, complement, neighborhood, city, state } = address;
+      await seed.address((x) =>
+        x(1, {
+          id,
+          userId,
+          cep,
+          street,
+          streetNumber,
+          complement,
+          neighborhood,
+          city,
+          state,
+        }),
+      );
+      await updateUserAddress(address);
+    });
   } else {
     const id = 1;
     const name = 'Sam de Almeida';
@@ -39,9 +58,38 @@ export const seedUsers = async (length?: number) => {
         birthDate,
       }),
     );
+
+    const address = {
+      id,
+      userId: id,
+      cep: '12345-678',
+      street: 'R. Existe',
+      streetNumber: '123A',
+      complement: 'T. Silveira, apt. 512',
+      neighborhood: 'Bairro',
+      city: 'Cidade',
+      state: 'Estado',
+    };
+    const { userId, cep, street, streetNumber, complement, neighborhood, city, state } = address;
+    await seed.address((x) =>
+      x(1, {
+        id,
+        userId,
+        cep,
+        street,
+        streetNumber,
+        complement,
+        neighborhood,
+        city,
+        state,
+      }),
+    );
+    await updateUserAddress(address);
   }
 
-  !length ? (length = 50) : length;
+  if (!length) {
+    length = 50;
+  }
 
   const users = Array.from({ length }).map(() => {
     const firstName = faker.person.firstName();
@@ -69,6 +117,47 @@ export const seedUsers = async (length?: number) => {
       }),
     );
   }
+  let counter = 1;
+  const addresses = Array.from({ length }).map(() => {
+    counter++;
+    const userId = faker.number.int({ min: 2, max: 51 });
+    const cep = faker.location.zipCode('#####-###');
+    const street = faker.location.street();
+    const streetNumber = faker.location.zipCode('###');
+    const complement = 'Apt. ' + faker.number.int({ min: 100, max: 500 });
+    const neighborhood = faker.location.county();
+    const city = faker.location.city();
+    const state = faker.location.state();
+    return {
+      id: counter,
+      userId,
+      cep,
+      street,
+      streetNumber,
+      complement,
+      neighborhood,
+      city,
+      state,
+    };
+  });
+
+  for (const address of addresses) {
+    await seed.address((x) =>
+      x(1, {
+        id: address.id,
+        userId: address.userId,
+        cep: address.cep,
+        street: address.street,
+        streetNumber: address.streetNumber,
+        complement: address.complement,
+        neighborhood: address.neighborhood,
+        city: address.city,
+        state: address.state,
+      }),
+    );
+
+    await updateUserAddress(address);
+  }
 };
 
-export default seedUsers;
+export default seedDb;
