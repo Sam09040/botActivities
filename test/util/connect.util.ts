@@ -1,5 +1,5 @@
 import { server } from '../../src/data/graphql/server';
-import { dbClient } from '../../src/data/db/client';
+import { dbClient } from '../../src/data/db/config/db.client';
 import 'dotenv/config';
 const port = process.env.PORT;
 

@@ -1,6 +1,6 @@
 import { AuthenticationError } from 'apollo-server';
-import { dbClient } from '../../db/client';
 import { verifyToken } from '../../validation/validation';
+import { countUsers, findAllUsers } from '../../user/user.db.datasource';
 
 export const usersQuery = async (skip: number | undefined, limit: number | undefined, token: string | undefined) => {
   if (!token) {
@@ -13,18 +13,12 @@ export const usersQuery = async (skip: number | undefined, limit: number | undef
 
   verifyToken(token);
 
-  const totalUsers = await dbClient.user.count();
+  const totalUsers = await countUsers();
   if (!limit) {
     limit = 10;
   }
 
-  const users = await dbClient.user.findMany({
-    skip,
-    take: limit,
-    orderBy: {
-      name: 'asc',
-    },
-  });
+  const users = await findAllUsers(skip, limit);
 
   const maxPage = Math.round(totalUsers / limit);
 

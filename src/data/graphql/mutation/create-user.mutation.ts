@@ -1,9 +1,9 @@
 import { AuthenticationError } from 'apollo-server';
-import { createUser, findUserByEmail } from '../../db/user';
 import { verifyToken } from '../../validation/validation';
 import { CustomError } from '../../errors/CustomError';
 import { User, UserInput } from '../../interfaces';
 import { encryptPassword, isPasswordValid } from '../password';
+import { createUser, findUserByEmail } from '../../user/user.db.datasource';
 
 export const createUserMutation = async ({ data }: UserInput, token: string | undefined): Promise<User> => {
   const { name, email, password, birthDate } = data;
@@ -21,7 +21,7 @@ export const createUserMutation = async ({ data }: UserInput, token: string | un
   if (!name || !email || !password || !birthDate) {
     throw new CustomError('400', 'Invalid input!', {
       field: 'data',
-      reason: 'Name, email, password and birthDate are required!',
+      reason: 'All fields are required!',
     });
   }
 
@@ -54,8 +54,8 @@ export const createUserMutation = async ({ data }: UserInput, token: string | un
 
   return {
     id: user.id,
-    name: user.name,
-    email: user.email,
-    birthDate: user.birthDate,
+    name,
+    email,
+    birthDate,
   };
 };

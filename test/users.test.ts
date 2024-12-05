@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { expect } from 'chai';
-import { createUser, deleteAll } from '../src/data/db/user';
 import { connectServer, connectDb } from './util/connect.util';
 import { disconnectServer, disconnectDb } from './util/disconnect.util';
 import { seedUsers } from '../snaplet/seed/define-seed';
@@ -8,6 +7,7 @@ import { getSeedClient } from '../snaplet/seed/seed-client';
 import { resetDatabase } from '../snaplet/seed/reset-database';
 import { getToken } from './util/get-token.util';
 import { encryptPassword } from '../src/data/graphql/password';
+import { deleteAllUsers, createUser } from '../src/data/user/user.db.datasource';
 
 describe('users query', () => {
   const port = process.env.PORT;
@@ -36,7 +36,7 @@ describe('users query', () => {
   });
   after('end services', async () => {
     await disconnectServer();
-    deleteAll();
+    deleteAllUsers();
     await disconnectDb();
   });
   beforeEach('create main user', async () => {
@@ -52,7 +52,7 @@ describe('users query', () => {
     token = await getToken(url);
   });
   afterEach('refresh db', async () => {
-    await resetDatabase(await getSeedClient(false));
+    await resetDatabase(await getSeedClient());
   });
 
   it('should return an error for no token', async () => {
@@ -139,7 +139,7 @@ describe('users query', () => {
       'Content-Type': 'application/json',
       Authorization: token,
     };
-    await deleteAll();
+    await deleteAllUsers();
     const variables = {
       skip: 0,
       limit: 0,
