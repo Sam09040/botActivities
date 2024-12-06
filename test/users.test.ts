@@ -8,6 +8,8 @@ import { deleteAllUsers, createUser } from '../src/data/user/user.db.datasource'
 import { resetDatabase } from '../snaplet/seed/reset-database';
 import { getSeedClient } from '../snaplet/seed/seed-client';
 import { seedDb } from '../snaplet/seed/define-seed';
+import { User } from '@prisma/client';
+import { getAddresses } from '../src/data/address/address.db.datasource';
 
 describe('users query', () => {
   const port = process.env.PORT;
@@ -39,6 +41,7 @@ describe('users query', () => {
   `;
   let token: string | undefined;
   let headers = {};
+  let user: User;
 
   before('begin services', async () => {
     await connectServer();
@@ -50,15 +53,15 @@ describe('users query', () => {
     await disconnectDb();
   });
   beforeEach('create main user', async () => {
-    const user = {
+    const userInfo = {
       data: {
-        name: 'Sam',
+        name: 'Sam de Almeida',
         email: 'sam@example.com',
         password: await encryptPassword('Sam123'),
         birthDate: '09-04-2004',
       },
     };
-    await createUser(user);
+    user = await createUser(userInfo);
     token = await getToken(url);
   });
   afterEach('refresh db', async () => {
@@ -88,7 +91,7 @@ describe('users query', () => {
     };
     await seedDb();
     const variables = {
-      skip: 0,
+      skip: 40,
       limit: 0,
     };
 
@@ -96,13 +99,12 @@ describe('users query', () => {
     const data = response.data.data.users;
     expect(data).to.have.property('users');
     expect(data.users.length).to.equal(10);
-    expect(data.users[4]).to.have.property('id');
-    expect(data.users[0]).to.have.property('name');
-    expect(data.users[1]).to.have.property('email');
-    expect(data.users[2]).to.have.property('birthDate');
-    expect(data.users[5]).to.have.property('addresses');
-    expect(data.users[3]).to.not.have.property('password');
-    expect(data.page).to.equal(1);
+    expect(data.users[2].id).to.equal(user.id.toString());
+    expect(data.users[2].name).to.equal(user.name);
+    expect(data.users[2].email).to.equal(user.email);
+    expect(data.users[2].birthDate).to.equal(user.birthDate);
+    expect(data.users[2]).to.have.property('addresses');
+    expect(data.page).to.equal(4);
     expect(data.maxPage).to.equal(5);
     expect(data.totalUsers).to.equal(51);
   });
@@ -150,26 +152,27 @@ describe('users query', () => {
       'Content-Type': 'application/json',
       Authorization: token,
     };
-    await seedDb();
+    await seedDb(10);
     const variables = {
-      skip: 0,
-      limit: 0,
+      skip: 7,
+      limit: 5,
     };
-
+    
+    const address = await getAddresses(1);
     const response = await axios.post(url, { query, variables }, { headers });
     const data = response.data.data.users.users;
-    expect(data[1]).to.have.property('addresses');
-    expect(data[1].addresses[0]).to.have.property('id');
-    expect(data[1].addresses[0]).to.have.property('cep');
-    expect(data[1].addresses[0]).to.have.property('street');
-    expect(data[1].addresses[0]).to.have.property('streetNumber');
-    expect(data[1].addresses[0]).to.have.property('complement');
-    expect(data[1].addresses[0]).to.have.property('neighborhood');
-    expect(data[1].addresses[0]).to.have.property('city');
-    expect(data[1].addresses[0]).to.have.property('state');
+    expect(data[2].name).to.equal(user.name);
+    expect(data[2]).to.have.property('addresses');
+    expect(data[2].addresses[0].cep).to.equal(address[0].cep);
+    expect(data[2].addresses[0].street).to.equal(address[0].street);
+    expect(data[2].addresses[0].streetNumber).to.equal(address[0].streetNumber);
+    expect(data[2].addresses[0].complement).to.equal(address[0].complement);
+    expect(data[2].addresses[0].neighborhood).to.equal(address[0].neighborhood);
+    expect(data[2].addresses[0].city).to.equal(address[0].city);
+    expect(data[2].addresses[0].state).to.equal(address[0].state);
   });
 
-  it('should return an error for no users', async () => {
+  it('should return an empty array for no users', async () => {
     headers = {
       'Content-Type': 'application/json',
       Authorization: token,

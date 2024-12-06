@@ -202,13 +202,13 @@ describe('address tests', () => {
         }
     `;
 
-    await createAddress(variables.userId, data);
+    const address = await createAddress(variables.userId, data);
     await createAddress(variables.userId, variables.data);
 
     const response = await axios.post(url, { query, variables: { userId } });
     const res = response.data.data;
     expect(res.address.length).to.equal(2);
-    expect(res.address[1].street).to.equal('R. Existe');
-    expect(res.address[1].streetNumber).to.equal('123');
+    expect(res.address[1].street).to.equal(address.street);
+    expect(res.address[1].streetNumber).to.equal(address.streetNumber);
   });
 });

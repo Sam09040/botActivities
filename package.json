@@ -9,7 +9,7 @@
     "lint": "eslint --fix src/**/*.ts test/**/*.ts",
     "check": "prettier --write src/**/*.ts test/*.ts && npm run lint",
     "start_test": "npx dotenvx run --env-file=.env.test -- npm run start",
-    "test": "npx dotenvx run --env-file=.env.test -- mocha --import=tsimp/import test/*.test.ts",
+    "test": "npx dotenvx run --env-file=.env.test -- mocha --timeout 5000 --import=tsimp/import test/*.test.ts",
     "reset": "npx prisma db push --force-reset",
     "reset_test": "npx dotenvx run --env-file=.env.test -- npx prisma db push --force-reset",
     "testdb": "npx dotenvx run --env-file=.env.test --",

@@ -16,7 +16,7 @@ export const resolvers = {
       { skip, limit }: { skip: number | undefined; limit: number | undefined },
       context: ContextType,
     ) => usersQuery(skip, limit, context.token),
-    user: async (_: unknown, { id }: { id: number }, context: ContextType) => userQuery(id, context.token),
+    user: async (_: unknown, { id }: { id: number }, context: ContextType): Promise<User> => userQuery(id, context.token),
     address: async (_: unknown, { userId }: { userId: number }) => addressQuery(userId),
   },
   Mutation: {

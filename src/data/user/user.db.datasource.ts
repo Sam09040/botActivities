@@ -1,4 +1,4 @@
-import { Address, User } from '@prisma/client';
+import { User } from '@prisma/client';
 import { UserInput } from '../../domain/interfaces';
 import { deleteAllAddresses } from '../address/address.db.datasource';
 import { dbClient } from '../db/config/db.client';
@@ -22,29 +22,7 @@ export const countUsers = (): Promise<number> => {
   return dbClient.user.count();
 };
 
-export const updateUserAddress = async (address: Address): Promise<User> => {
-  return dbClient.user.update({
-    where: {
-      id: address.userId,
-    },
-    data: {
-      addresses: {
-        connect: {
-          id: address.id,
-        },
-      },
-    },
-    include: {
-      addresses: true,
-    },
-  });
-};
-
-export const findAllUsers = (skip?: number, limit?: number): Promise<User[]> => {
-  if (!limit) {
-    limit = 10;
-  }
-
+export const findAllUsers = (skip?: number, limit: number = 10): Promise<User[]> => {
   return dbClient.user.findMany({
     skip,
     take: limit,

@@ -38,7 +38,7 @@ describe('user query', () => {
   beforeEach('before each', async () => {
     const userInfo = {
       data: {
-        name: 'Sam',
+        name: 'Sam de Almeida',
         email: 'sam@example.com',
         password: await encryptPassword('Sam123'),
         birthDate: '09-04-2004',
@@ -99,9 +99,9 @@ describe('user query', () => {
     const response = await axios.post(url, { query, variables }, { headers });
     const data = response.data.data;
     expect(data).to.have.property('user');
-    expect(data.user.name).to.equal('Sam');
-    expect(data.user.email).to.equal('sam@example.com');
-    expect(data.user.birthDate).to.equal('09-04-2004');
+    expect(data.user.name).to.equal(user.name);
+    expect(data.user.email).to.equal(user.email);
+    expect(data.user.birthDate).to.equal(user.birthDate);
   });
 
   it('should return user and address', async () => {
@@ -150,9 +150,9 @@ describe('user query', () => {
 
     const response = await axios.post(url, { query, variables }, { headers });
     const data = response.data.data;
-    expect(data.user.name).to.equal('Sam');
-    expect(data.user.email).to.equal('sam@example.com');
-    expect(data.user.birthDate).to.equal('09-04-2004');
+    expect(data.user.name).to.equal(user.name);
+    expect(data.user.email).to.equal(user.email);
+    expect(data.user.birthDate).to.equal(user.birthDate);
     expect(data.user).to.have.property('addresses');
     expect(data.user.addresses[0].id).to.equal(address.id.toString());
     expect(data.user.addresses[0].cep).to.equal(address.cep);
