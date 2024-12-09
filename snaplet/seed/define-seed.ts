@@ -6,8 +6,7 @@ import { findUserByEmail } from '../../src/data/user/user.db.datasource';
 
 export const seedDb = async (length: number = 50) => {
   const seed = await getSeedClient();
-  
-  if (!findUserByEmail('sam@example.com')) {
+  if (!await findUserByEmail('sam@example.com')) {
     const id = 1;
     const password = await encryptPassword('Sam123');
     await seed.user([
@@ -20,7 +19,6 @@ export const seedDb = async (length: number = 50) => {
       },
     ]);
   }
-
   await seed.address([
     {
       id: 1,

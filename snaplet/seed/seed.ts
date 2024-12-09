@@ -3,5 +3,5 @@ import { resetDatabase } from './reset-database';
 import { getSeedClient } from './seed-client';
 
 await resetDatabase(await getSeedClient());
-seedDb();
+await seedDb();
 console.log('Seed finished successfully!');
