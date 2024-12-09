@@ -1,10 +1,11 @@
 import { AuthenticationError } from 'apollo-server';
-import { verifyToken } from '../../validation/validation';
-import { CustomError } from '../../errors/CustomError';
+import { CustomError } from '../../../core/errors/CustomError';
 import 'dotenv/config';
-import { findUserById } from '../../user/user.db.datasource';
+import { findUserById } from '../../../data/user/user.db.datasource';
+import { verifyToken } from '../../../core/security/validation/validation';
+import { User } from '../../../domain/interfaces';
 
-export const userQuery = (id: number, token: string | undefined) => {
+export const userQuery = async (id: number, token: string | undefined): Promise<User> => {
   if (!token) {
     throw new AuthenticationError('Token is required for this operation!', {
       http_status: '400',
@@ -15,13 +16,13 @@ export const userQuery = (id: number, token: string | undefined) => {
 
   verifyToken(token);
 
-  const user = findUserById(id);
-  if (user === null) {
+  const user = await findUserById(id);
+  if (!user) {
     throw new CustomError('404', 'User not found!', {
       field: 'id',
       reason: 'The provided id does not exist.',
     });
   }
-
+  
   return user;
 };

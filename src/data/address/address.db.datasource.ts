@@ -1,5 +1,5 @@
 import { dbClient } from '../db/config/db.client';
-import { Address } from '../interfaces';
+import { Address } from '../../domain/interfaces';
 
 export const createAddress = async (userId: number, address: Address) => {
   const { street, streetNumber, city, state, cep, neighborhood, complement } = address;
@@ -17,7 +17,7 @@ export const createAddress = async (userId: number, address: Address) => {
   });
 };
 
-export const getUserAddresses = async (userId: number) => {
+export const getAddresses = async (userId?: number) => {
   return dbClient.address.findMany({
     where: { userId },
   });

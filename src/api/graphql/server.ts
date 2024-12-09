@@ -1,9 +1,9 @@
 import { ApolloServer, AuthenticationError, gql } from 'apollo-server';
 import { readFileSync } from 'fs';
-import { CustomError } from '../errors/CustomError';
+import { CustomError } from '../../core/errors/CustomError';
 import { ContextType } from './context-type';
 import { resolvers } from './resolvers';
-const typeDefs = gql(readFileSync('./src/data/graphql/schema.graphql', 'utf8'));
+const typeDefs = gql(readFileSync('./src/api/graphql/schema.graphql', 'utf8'));
 
 export const server = new ApolloServer({
   typeDefs,

@@ -1,5 +1,5 @@
 import { dbClient } from '../../src/data/db/config/db.client';
-import { server } from '../../src/data/graphql/server';
+import { server } from '../../src/api/graphql/server';
 
 export const disconnectServer = async () => {
   if (server) {

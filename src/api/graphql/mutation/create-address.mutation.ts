@@ -1,7 +1,7 @@
-import { createAddress } from '../../address/address.db.datasource';
-import { CustomError } from '../../errors/CustomError';
-import { Address } from '../../interfaces';
-import { findUserById } from '../../user/user.db.datasource';
+import { CustomError } from '../../../core/errors/CustomError';
+import { createAddress } from '../../../data/address/address.db.datasource';
+import { findUserById } from '../../../data/user/user.db.datasource';
+import { Address } from '../../../domain/interfaces';
 
 export const createAddressMutation = async (userId: number, address: Address) => {
   if (!userId) {

@@ -1,8 +1,8 @@
-import { CustomError } from '../../errors/CustomError';
-import { LoginInput } from '../../interfaces';
-import { comparePassword } from '../password';
-import { createToken } from '../../validation/token';
-import { findUserByEmail } from '../../user/user.db.datasource';
+import { CustomError } from '../../../core/errors/CustomError';
+import { comparePassword } from '../../../core/security/password';
+import { createToken } from '../../../core/security/validation/token';
+import { findUserByEmail } from '../../../data/user/user.db.datasource';
+import { LoginInput } from '../../../domain/interfaces';
 
 export const loginMutation = async ({ data }: LoginInput) => {
   const { email, password, rememberMe } = data;

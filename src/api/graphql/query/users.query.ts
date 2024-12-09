@@ -1,6 +1,6 @@
 import { AuthenticationError } from 'apollo-server';
-import { verifyToken } from '../../validation/validation';
-import { countUsers, findAllUsers } from '../../user/user.db.datasource';
+import { verifyToken } from '../../../core/security/validation/validation';
+import { countUsers, findAllUsers } from '../../../data/user/user.db.datasource';
 
 export const usersQuery = async (skip: number | undefined, limit: number | undefined, token: string | undefined) => {
   if (!token) {

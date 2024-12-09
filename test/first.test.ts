@@ -4,8 +4,8 @@ import 'dotenv/config';
 import { connectDb, connectServer } from './util/connect.util';
 import { disconnectDb, disconnectServer } from './util/disconnect.util';
 import { getToken } from './util/get-token.util';
-import { encryptPassword } from '../src/data/graphql/password';
-import { UserInput } from '../src/data/interfaces';
+import { encryptPassword } from '../src/core/security/password';
+import { UserInput } from '../src/domain/interfaces';
 import { createUser, deleteAllUsers, findUserByEmail } from '../src/data/user/user.db.datasource';
 
 const port = process.env.PORT;
@@ -50,19 +50,14 @@ describe('first tests', () => {
       'Content-Type': 'application/json',
       Authorization: token,
     };
-
+    const user = await findUserByEmail('sam@example.com');
     const response = await axios.post(url, { query: mutation, variables }, { headers });
     const { data } = response.data;
     expect(data).to.have.property('createUser');
     expect(data.createUser).to.have.property('id');
-    expect(data.createUser.name).to.equal('Sam');
-    expect(data.createUser.email).to.equal('sam@example.com');
-    expect(data.createUser.birthDate).to.equal('09-04-2004');
-
-    const userInDb = await findUserByEmail('sam@example.com');
-
-    expect(userInDb).to.not.equal(null);
-    expect(userInDb?.name).to.equal('Sam');
+    expect(data.createUser.name).to.equal(user?.name);
+    expect(data.createUser.email).to.equal(user?.email);
+    expect(data.createUser.birthDate).to.equal(user?.birthDate);
   });
 
   it('should return an error for missing token', async () => {

@@ -1,17 +1,17 @@
 import axios from 'axios';
-import { encryptPassword } from '../src/data/graphql/password';
+import { encryptPassword } from '../src/core/security/password';
 import { connectDb, connectServer } from './util/connect.util';
 import { disconnectServer, disconnectDb } from './util/disconnect.util';
 import { expect } from 'chai';
-import { createUser } from '../src/data/user/user.db.datasource';
-import { getUserAddresses, createAddress } from '../src/data/address/address.db.datasource';
-import { resetDatabase } from '../snaplet/seed/reset-database';
+import { createUser, deleteAllUsers } from '../src/data/user/user.db.datasource';
+import { getAddresses, createAddress } from '../src/data/address/address.db.datasource';
 import { getSeedClient } from '../snaplet/seed/seed-client';
+import { resetDatabase } from '../snaplet/seed/reset-database';
 
 const port = process.env.PORT;
 const url = `http://localhost:${port}/`;
 
-describe('address testes', () => {
+describe('address tests', () => {
   const mutation = `
         mutation createAddress($userId: Int!, $data: AddressInput!){
             createAddress(userId: $userId, data: $data) {
@@ -32,10 +32,10 @@ describe('address testes', () => {
   before('before', async () => {
     await connectServer();
     await connectDb();
-    
   });
 
   after('after', async () => {
+    await resetDatabase(await getSeedClient());
     await disconnectServer();
     await disconnectDb();
   });
@@ -56,20 +56,20 @@ describe('address testes', () => {
   });
 
   afterEach('after each', async () => {
-    await resetDatabase(await getSeedClient());
+    await deleteAllUsers();
   });
 
   it('should return error for userId not provided', async () => {
     const variables = {
       userId: 0,
       data: {
-        cep: '41650-195',
-        street: 'R. da Gratidão',
-        streetNumber: '290F',
-        complement: 'T. turquesa, apt 302',
-        neighborhood: 'Piatã',
-        city: 'Salvador',
-        state: 'Bahia',
+        cep: '12345-678',
+        street: 'R. Existe',
+        streetNumber: '123A',
+        complement: 'T. Silveira, apt. 512',
+        neighborhood: 'Bairro',
+        city: 'Cidade',
+        state: 'Estado',
       },
     };
 
@@ -88,13 +88,13 @@ describe('address testes', () => {
     const variables = {
       userId: userId + 1,
       data: {
-        cep: '41650-195',
-        street: 'R. da Gratidão',
-        streetNumber: '290F',
-        complement: 'T. turquesa, apt 302',
-        neighborhood: 'Piatã',
-        city: 'Salvador',
-        state: 'Bahia',
+        cep: '12345-678',
+        street: 'R. Existe',
+        streetNumber: '123A',
+        complement: 'T. Silveira, apt. 512',
+        neighborhood: 'Bairro',
+        city: 'Cidade',
+        state: 'Estado',
       },
     };
 
@@ -113,13 +113,13 @@ describe('address testes', () => {
     const variables = {
       userId,
       data: {
-        cep: '41650-195',
+        cep: '12345-678',
         street: '',
-        streetNumber: '290F',
-        complement: 'T. turquesa, apt 302',
-        neighborhood: 'Piatã',
-        city: 'Salvador',
-        state: 'Bahia',
+        streetNumber: '123A',
+        complement: 'T. Silveira, apt. 512',
+        neighborhood: 'Bairro',
+        city: 'Cidade',
+        state: 'Estado',
       },
     };
 
@@ -138,19 +138,19 @@ describe('address testes', () => {
     const variables = {
       userId,
       data: {
-        cep: '41650-195',
-        street: 'R. da Gratidão',
-        streetNumber: '290F',
-        complement: 'T. turquesa, apt 302',
-        neighborhood: 'Piatã',
-        city: 'Salvador',
-        state: 'Bahia',
+        cep: '12345-678',
+        street: 'R. Existe',
+        streetNumber: '123A',
+        complement: 'T. Silveira, apt. 512',
+        neighborhood: 'Bairro',
+        city: 'Cidade',
+        state: 'Estado',
       },
     };
 
     const response = await axios.post(url, { query: mutation, variables });
     const res = response.data.data.createAddress;
-    const address = await getUserAddresses(userId);
+    const address = await getAddresses(userId);
     expect(res.id).to.equal(address[0].id.toString());
     expect(res.cep).to.equal(address[0].cep);
     expect(res.street).to.equal(address[0].street);
@@ -163,13 +163,13 @@ describe('address testes', () => {
 
   it('should return 2 addresses', async () => {
     const data = {
-      cep: '41650-195',
-      street: 'R. da Gratidão',
-      streetNumber: '290F',
-      complement: 'T. turquesa, apt 302',
-      neighborhood: 'Piatã',
-      city: 'Salvador',
-      state: 'Bahia',
+      cep: '12345-678',
+      street: 'R. Existe',
+      streetNumber: '123A',
+      complement: 'T. Silveira, apt. 512',
+      neighborhood: 'Bairro',
+      city: 'Cidade',
+      state: 'Estado',
     };
 
     const variables = {
@@ -177,13 +177,13 @@ describe('address testes', () => {
       data: {
         id: 0,
         userId: 0,
-        cep: '12345-678',
-        street: 'R. Existe',
-        streetNumber: '123',
+        cep: '87654-321',
+        street: 'R. Rua',
+        streetNumber: '321',
         complement: '',
-        neighborhood: 'Bairro',
-        city: 'Cidade',
-        state: 'Estado',
+        neighborhood: 'Neigh',
+        city: 'City',
+        state: 'State',
       },
     };
 
@@ -202,13 +202,13 @@ describe('address testes', () => {
         }
     `;
 
-    await createAddress(variables.userId, data);
+    const address = await createAddress(variables.userId, data);
     await createAddress(variables.userId, variables.data);
 
     const response = await axios.post(url, { query, variables: { userId } });
     const res = response.data.data;
     expect(res.address.length).to.equal(2);
-    expect(res.address[1].street).to.equal('R. Existe');
-    expect(res.address[1].streetNumber).to.equal('123');
+    expect(res.address[1].street).to.equal(address.street);
+    expect(res.address[1].streetNumber).to.equal(address.streetNumber);
   });
 });
