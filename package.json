@@ -4,35 +4,42 @@
   "description": "Project using Apollo Server and Prisma using TypeScript",
   "main": "index.js",
   "scripts": {
-    "start": "node --import=tsimp/import src/index.ts",
+    "check": "prettier -w src/**/*.ts && npm run lint",
+    "compose:stop": "docker-compose stop",
+    "compose:start": "docker-compose start",
     "dev": "tsx watch src/index.ts",
-    "lint": "eslint --fix src/**/*.ts test/**/*.ts",
-    "check": "prettier --write src/**/*.ts test/*.ts && npm run lint",
-    "start_test": "npx dotenvx run --env-file=.env.test -- npm run start",
-    "test": "npx dotenvx run --env-file=.env.test -- mocha --timeout 5000 --import=tsimp/import test/*.test.ts",
+    "lint": "eslint --fix src/**/*.ts",
     "reset": "npx prisma db push --force-reset",
-    "reset_test": "npx dotenvx run --env-file=.env.test -- npx prisma db push --force-reset",
-    "testdb": "npx dotenvx run --env-file=.env.test --",
-    "seeds": "node --import=tsimp/import snaplet/seed/seed.ts"
+    "reset:test": "npm run testdb -- npx prisma db push --force-reset",
+    "seeds": "node -r ts-node/register src/data/db/seed/seed.ts --exit",
+    "start": "node -r ts-node/register -r tsconfig-paths/register src/index.ts",
+    "start:test": "npm run testdb -- npm run start",
+    "test": "npm run testdb -- mocha --exit",
+    "testdb": "npx dotenvx run --env-file=.env.test --"
   },
   "keywords": [
     "apollo",
     "prisma",
-    "ts"
+    "typescript",
+    "graphql"
   ],
   "prisma": {
     "schema": "src/data/db/schema.prisma"
   },
   "author": "Sam",
   "license": "ISC",
-  "type": "module",
+  "type": "commonjs",
   "dependencies": {
     "@faker-js/faker": "9.2.0",
     "@prisma/client": "6.0.0",
+    "@typescript-eslint/parser": "8.18.0",
     "apollo-server": "3.13.0",
+    "chai": "4.4.1",
     "date-fns": "4.1.0",
     "fs": "0.0.1-security",
-    "graphql": "16.9.0"
+    "graphql": "16.9.0",
+    "joi": "17.13.3",
+    "tsconfig-paths": "4.2.0"
   },
   "devDependencies": {
     "@apollo/client": "3.11.10",
@@ -49,7 +56,6 @@
     "apollo-server": "3.13.0",
     "axios": "1.7.8",
     "bcrypt": "5.1.1",
-    "chai": "5.1.2",
     "dotenv": "16.4.5",
     "eslint": "9.15.0",
     "eslint-config-prettier": "9.1.0",
@@ -57,13 +63,13 @@
     "globals": "15.12.0",
     "graphql": "16.9.0",
     "jsonwebtoken": "9.0.2",
-    "mocha": "10.8.2",
+    "mocha": "11.0.1",
     "prettier": "3.4.1",
     "prisma": "6.0.0",
     "ts-node": "10.9.2",
     "tsimp": "2.0.12",
     "tsx": "4.19.2",
-    "typescript": "5.7.2",
+    "typescript": "5.5.3",
     "typescript-eslint": "8.16.0"
   }
 }

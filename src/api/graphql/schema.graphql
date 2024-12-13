@@ -1,13 +1,13 @@
 type Query {
-    address(userId: Int!): [Address],
-    users(skip: Int, limit: Int): UsersPayload,
-    user(id: Int!): User,
-    hello: String
+    address(userId: Int!): [Address]!
+    users(input: PageInput!): UsersPayload!
+    user(id: Int!): User!
+    hello: String!
 }
 
 type Mutation {
-    createUser(data: UserInput!): User!,
-    createAddress(userId: Int!, data: AddressInput!): Address!,
+    createUser(data: UserInput!): User!
+    createAddress(data: AddressInput!): Address!
     login(data: LoginInput!): AuthPayload!
 }
 
@@ -36,10 +36,14 @@ type AuthPayload {
 }
 
 type UsersPayload {
-    users: [User]!,
-    totalUsers: Int,
-    page: Int,
+    users: [User]!
+    page: Int
     maxPage: Int
+}
+
+input PageInput {
+    limit: Int = 10
+    skip: Int = 0
 }
 
 input UserInput {
@@ -56,6 +60,7 @@ input LoginInput {
 }
 
 input AddressInput {
+    userId: Int!
     cep: String!
     street: String!
     streetNumber: String!

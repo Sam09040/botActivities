@@ -1,28 +1,12 @@
 import { dbClient } from '../db/config/db.client';
-import { Address } from '../../domain/interfaces';
+import { AddressInputModel, AddressModel } from '@domain/model';
 
-export const createAddress = async (userId: number, address: Address) => {
-  const { street, streetNumber, city, state, cep, neighborhood, complement } = address;
-  return dbClient.address.create({
-    data: {
-      userId,
-      street,
-      streetNumber,
-      city,
-      state,
-      cep,
-      neighborhood,
-      complement,
-    },
-  });
-};
+export class AddressDbDataSource {
+  insert(input: AddressInputModel): Promise<AddressModel> {
+    return dbClient.address.create({ data: input.data });
+  }
 
-export const getAddresses = async (userId?: number) => {
-  return dbClient.address.findMany({
-    where: { userId },
-  });
-};
-
-export const deleteAllAddresses = async () => {
-  return dbClient.address.deleteMany();
-};
+  findAddresses(userId?: number) {
+    return dbClient.address.findMany({ where: { userId } });
+  }
+}
