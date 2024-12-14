@@ -4,7 +4,7 @@ import { dbClient } from '../db/config/db.client';
 
 export class UserDbDataSource {
   insert(input: UserInputModel): Promise<UserModel> {
-    return dbClient.user.create({ data: input.data, include: { addresses: true } });
+    return dbClient.user.create({ data: input, include: { addresses: true } });
   }
 
   count() {

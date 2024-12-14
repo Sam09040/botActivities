@@ -1,7 +1,6 @@
 import { connectDb, connectServer } from '@test/utils/connect.util';
 import { disconnectDb, disconnectServer } from '@test/utils/disconnect.util';
 import { getToken } from '@test/utils/get-token.util';
-import { UserInputModel } from '@domain/model';
 import { UserDbDataSource } from '@data/user';
 import { resetDatabase } from '@data/db/seed/reset-database';
 import { getSeedClient } from '@data/db/seed/seed-client';
@@ -26,8 +25,8 @@ describe('UserResolver - CreateUser', () => {
   before('before', async () => {
     await connectServer();
     await connectDb();
-    await createUser();
-    token = await getToken();
+    const user = await createUser();
+    token = await getToken(user);
   });
 
   after('after', async () => {
@@ -49,7 +48,7 @@ describe('UserResolver - CreateUser', () => {
         birthDate: '09-04-2004',
       },
     };
-    const response = await requestMaker<any, UserInputModel>({ query: mutation, variables }, headers);
+    const response = await requestMaker<any, any>({ query: mutation, variables }, headers);
     const user = await datasource.findOneByEmail('sam@example.com');
     checkUser(response.data.data.createUser, user);
   });
@@ -64,7 +63,7 @@ describe('UserResolver - CreateUser', () => {
       },
     };
 
-    const response = await requestMaker<any, UserInputModel>({ query: mutation, variables });
+    const response = await requestMaker<any, any>({ query: mutation, variables });
     const error = response.data.errors[0];
     checkError(response, error.code, error.message, error.additionalInfo);
   });
@@ -83,7 +82,7 @@ describe('UserResolver - CreateUser', () => {
       },
     };
 
-    const response = await requestMaker<any, UserInputModel>({ query: mutation, variables }, headers);
+    const response = await requestMaker<any, any>({ query: mutation, variables }, headers);
     const error = response.data.errors[0];
     checkError(response, error.code, error.message, error.additionalInfo);
   });
@@ -101,7 +100,7 @@ describe('UserResolver - CreateUser', () => {
       },
     };
 
-    const response = await requestMaker<any, UserInputModel>({ query: mutation, variables }, headers);
+    const response = await requestMaker<any, any>({ query: mutation, variables }, headers);
     const error = response.data.errors[0];
     checkError(response, error.code, error.message, error.additionalInfo);
   });
@@ -119,7 +118,7 @@ describe('UserResolver - CreateUser', () => {
       },
     };
 
-    const response = await requestMaker<any, UserInputModel>({ query: mutation, variables }, headers);
+    const response = await requestMaker<any, any>({ query: mutation, variables }, headers);
     const error = response.data.errors[0];
     checkError(response, error.code, error.message, error.additionalInfo);
   });
@@ -137,7 +136,7 @@ describe('UserResolver - CreateUser', () => {
       },
     };
 
-    const response = await requestMaker<any, UserInputModel>({ query: mutation, variables }, headers);
+    const response = await requestMaker<any, any>({ query: mutation, variables }, headers);
     const error = response.data.errors[0];
     checkError(response, error.code, error.message, error.additionalInfo);
   });

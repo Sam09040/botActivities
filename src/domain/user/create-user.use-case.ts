@@ -18,7 +18,7 @@ export async function createUserUseCase(input: UserInputModel, token: string | u
   }
 
   jwtService.verify(token);
-  const { name, email, password, birthDate } = input.data;
+  const { name, email, password, birthDate } = input;
   if (!name || !email || !password || !birthDate) {
     throw new InvalidDataError('Invalid input!', {
       field: 'data',
@@ -44,12 +44,10 @@ export async function createUserUseCase(input: UserInputModel, token: string | u
   }
 
   const newUser = {
-    data: {
-      name,
-      email,
-      password: await bcryptService.encrypt(password),
-      birthDate,
-    },
+    name,
+    email,
+    password: await bcryptService.encrypt(password),
+    birthDate,
   };
 
   const user = await datasource.insert(newUser);

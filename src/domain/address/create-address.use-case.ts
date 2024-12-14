@@ -7,13 +7,7 @@ const addressDatasource = new AddressDbDataSource();
 const userDatasource = new UserDbDataSource();
 
 export async function createAddressUseCase(input: AddressInputModel): Promise<AddressModel> {
-  if (!input.data.userId) {
-    throw new InvalidDataError('No user provided', {
-      field: 'userId',
-      reason: 'A user ID is required to create an address',
-    });
-  }
-  const user = await userDatasource.findOneById(input.data.userId);
+  const user = await userDatasource.findOneById(input.userId);
   if (!user) {
     throw new NotFoundError('User not found!', {
       field: 'userId',
@@ -21,7 +15,7 @@ export async function createAddressUseCase(input: AddressInputModel): Promise<Ad
     });
   }
 
-  const { cep, street, streetNumber, neighborhood, city, state } = input.data;
+  const { cep, street, streetNumber, neighborhood, city, state } = input;
 
   if (!cep || !street || !streetNumber || !neighborhood || !city || !state) {
     throw new InvalidDataError('Invalid input!', {

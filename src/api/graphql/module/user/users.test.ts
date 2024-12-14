@@ -54,7 +54,7 @@ describe('UserResolver - Users', () => {
   });
   beforeEach('create main user', async () => {
     user = await createUser();
-    token = await getToken();
+    token = await getToken(user);
   });
   afterEach('refresh db', async () => {
     await resetDatabase(await getSeedClient());

@@ -7,12 +7,6 @@ const addressDatasource = new AddressDbDataSource();
 const userDatasource = new UserDbDataSource();
 
 export async function addressUseCase(userId: number): Promise<AddressModel[]> {
-  if (!userId) {
-    throw new InvalidDataError('No user provided', {
-      field: 'userId',
-      reason: 'A user ID is required to fetch the address.',
-    });
-  }
   const user = await userDatasource.findOneById(userId);
 
   if (!user) {

@@ -2,7 +2,6 @@ import { connectServer, connectDb } from '@test/utils/connect.util';
 import { disconnectServer, disconnectDb } from '@test/utils/disconnect.util';
 import { requestMaker } from '@test/request-maker';
 import { checkError, checkLogin } from '@test/checker.test';
-import { LoginInputModel } from '@domain/model';
 import { createUser } from '@test/entity-seed.test';
 import { UserDbDataSource } from '@data/user';
 import { resetDatabase } from '@data/db/seed/reset-database';
@@ -73,7 +72,7 @@ describe('UserResolver - Login', () => {
       },
     };
 
-    const response = await requestMaker<any, LoginInputModel>({ query: mutation, variables }, { token: 'none' });
+    const response = await requestMaker<any, any>({ query: mutation, variables }, { token: 'none' });
     const user = await datasource.findOneByEmail('sam@example.com');
     checkLogin(response.data.data.login, user);
   });

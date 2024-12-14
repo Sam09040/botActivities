@@ -64,7 +64,7 @@ describe('UserResolver - User', () => {
   });
 
   it('should return user', async () => {
-    token = await getToken();
+    token = await getToken(user);
     const variables = {
       userId: user.id,
     };
@@ -102,7 +102,7 @@ describe('UserResolver - User', () => {
       userId: user.id,
     };
     const address = await createAddress(addressInfo.userId);
-    token = await getToken();
+    token = await getToken(user);
     const variables = {
       userId: user.id,
     };

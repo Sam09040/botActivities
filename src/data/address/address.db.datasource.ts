@@ -3,7 +3,7 @@ import { AddressInputModel, AddressModel } from '@domain/model';
 
 export class AddressDbDataSource {
   insert(input: AddressInputModel): Promise<AddressModel> {
-    return dbClient.address.create({ data: input.data });
+    return dbClient.address.create({ data: input });
   }
 
   findAddresses(userId?: number) {

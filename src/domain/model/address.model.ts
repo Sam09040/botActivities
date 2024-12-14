@@ -11,14 +11,12 @@ export interface AddressModel {
 }
 
 export interface AddressInputModel {
-  data: {
-    userId: number;
-    cep: string;
-    street: string;
-    streetNumber: string;
-    complement?: string | null;
-    neighborhood: string;
-    city: string;
-    state: string;
-  };
+  userId: number;
+  cep: string;
+  street: string;
+  streetNumber: string;
+  complement?: string | null;
+  neighborhood: string;
+  city: string;
+  state: string;
 }

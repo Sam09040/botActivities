@@ -52,29 +52,25 @@ describe('AddressResolver - Address', () => {
 
   it('should return 2 addresses', async () => {
     const data = {
-      data: {
-        userId,
-        cep: '12345-678',
-        street: 'R. Existe',
-        streetNumber: '123A',
-        complement: 'T. Silveira, apt. 512',
-        neighborhood: 'Bairro',
-        city: 'Cidade',
-        state: 'Estado',
-      },
+      userId,
+      cep: '12345-678',
+      street: 'R. Existe',
+      streetNumber: '123A',
+      complement: 'T. Silveira, apt. 512',
+      neighborhood: 'Bairro',
+      city: 'Cidade',
+      state: 'Estado',
     };
 
     const variables = {
-      data: {
-        userId,
-        cep: '87654-321',
-        street: 'R. Rua',
-        streetNumber: '321',
-        complement: '',
-        neighborhood: 'Neigh',
-        city: 'City',
-        state: 'State',
-      },
+      userId,
+      cep: '87654-321',
+      street: 'R. Rua',
+      streetNumber: '321',
+      complement: '',
+      neighborhood: 'Neigh',
+      city: 'City',
+      state: 'State',
     };
 
     await addressDatasource.insert(data);

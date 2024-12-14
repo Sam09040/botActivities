@@ -9,7 +9,7 @@ const jwtService = new JwtService();
 const bcryptService = new BcryptService();
 
 export async function loginUseCase(input: LoginInputModel): Promise<LoginModel> {
-  const { email, password, rememberMe } = input.data;
+  const { email, password, rememberMe } = input;
   if (!email || !password) {
     throw new InvalidDataError('Invalid email or password', {
       field: 'email or password',

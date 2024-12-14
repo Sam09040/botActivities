@@ -6,12 +6,10 @@ export interface UserModel {
 }
 
 export interface UserInputModel {
-  data: {
-    name: string;
-    email: string;
-    password: string;
-    birthDate: string;
-  };
+  name: string;
+  email: string;
+  password: string;
+  birthDate: string;
 }
 
 export interface LoginModel {
@@ -20,9 +18,7 @@ export interface LoginModel {
 }
 
 export interface LoginInputModel {
-  data: {
-    email: string;
-    password: string;
-    rememberMe: boolean;
-  };
+  email: string;
+  password: string;
+  rememberMe: boolean;
 }
