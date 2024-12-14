@@ -1,21 +1,20 @@
 import { InvalidDataError } from '@core/error';
 import { addressUseCase, createAddressUseCase } from '@domain/address';
-import { AddressInputModel } from '@domain/model';
+import { Arg, Int, Mutation, Query, Resolver } from 'type-graphql';
+import { Address } from './address.type';
+import { AddressInput } from './address.input';
 
-export const resolvers = {
-  Query: {
-    address: async (_: unknown, { userId }: { userId: number }) => addressUseCase(userId),
-  },
-  Mutation: {
-    createAddress: async (_: unknown, { data }: any) => {
-      const { cep, street, streetNumber, neighborhood, city, state } = data;
-      if (!cep || !street || !streetNumber || !city || !state || !neighborhood) {
-        throw new InvalidDataError('Invalid data received', {
-          field: 'data',
-          reason: 'All fields are required! (expect complement)',
-        });
-      }
-      createAddressUseCase(data)
-    },
-  },
-};
+@Resolver()
+export class AddressResolver {
+  constructor() {}
+
+  @Query(() => [Address], { description: 'Get addresses' })
+  async address(@Arg('userId', () => Int) userId: number) {
+    return addressUseCase(userId);
+  }
+
+  @Mutation(() => Address, { description: 'Create a new address' })
+  async createAddress(@Arg('data') data: AddressInput) {
+    return createAddressUseCase(data);
+  }
+}

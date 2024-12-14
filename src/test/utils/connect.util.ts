@@ -1,6 +1,5 @@
 import { dbClient } from '@data/db/config';
 import { run } from '@graphql';
-import 'dotenv/config';
 
 export const connectServer = async () => {
   run();

@@ -32,8 +32,6 @@ export async function createUserUseCase(input: UserInputModel): Promise<UserMode
     password: await bcryptService.encrypt(password),
     birthDate,
   };
-
-  const user = await datasource.insert(newUser);
-
-  return user;
+  
+  return await datasource.insert(newUser);
 }

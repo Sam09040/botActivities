@@ -1,3 +1,4 @@
+import 'dotenv/config';
 const PASSWORD_MIN_LENGTH: number = Number(process.env.PASSWORD_MIN_LENGTH);
 
 function hasDigit(value?: string): boolean {

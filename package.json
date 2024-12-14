@@ -35,11 +35,15 @@
     "@typescript-eslint/parser": "8.18.0",
     "apollo-server": "3.13.0",
     "chai": "4.4.1",
+    "class-validator": "0.14.1",
     "date-fns": "4.1.0",
     "fs": "0.0.1-security",
     "graphql": "16.9.0",
+    "graphql-scalars": "1.24.0",
     "joi": "17.13.3",
-    "tsconfig-paths": "4.2.0"
+    "reflect-metadata": "0.2.2",
+    "tsconfig-paths": "4.2.0",
+    "type-graphql": "2.0.0-rc.2"
   },
   "devDependencies": {
     "@apollo/client": "3.11.10",

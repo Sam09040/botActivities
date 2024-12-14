@@ -1,4 +1,3 @@
-import { ErrorType } from '@core/error';
 import { GraphqlResponse } from './request-maker';
 import { expect } from 'chai';
 import { isDefined } from './utils/is-defined';

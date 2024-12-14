@@ -1,8 +1,11 @@
+import { AddressModel } from './address.model';
+
 export interface UserModel {
   id: number;
   name: string;
   email: string;
   birthDate: string;
+  addresses: Array<AddressModel>;
 }
 
 export interface UserInputModel {

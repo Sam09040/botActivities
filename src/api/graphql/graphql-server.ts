@@ -1,26 +1,36 @@
-import { ApolloServer, gql } from 'apollo-server';
+import { gql } from 'apollo-server';
+import { ApolloServer } from '@apollo/server';
+import { startStandaloneServer } from '@apollo/server/standalone';
 import { readFileSync } from 'fs';
-import { ContextType } from './context-type';
-import { resolvers } from './resolvers';
+import { context } from './server.context';
 import { errorFormatter } from './graphql-error.formatter';
+import { buildSchema } from 'type-graphql';
+import { UserResolver } from './module/user/user.resolver';
+import { AddressResolver } from './module/address/address.resolver';
+import { GraphQLError } from 'graphql';
 const typeDefs = gql(readFileSync('./src/api/graphql/schema.graphql', 'utf8'));
 let server: ApolloServer;
 
-export function run() {
-  const port = process.env.PORT;
+export async function run() {
+  const schema = await buildSchema({
+    resolvers: [UserResolver, AddressResolver],
+  });
+  const port = Number(process.env.PORT);
   server = new ApolloServer({
-    typeDefs,
-    resolvers,
-    formatError: errorFormatter,
-    context: ({ req }): ContextType => {
-      const token = req.headers.authorization ?? undefined;
-      return { token };
+    schema,
+    formatError: (_, error) => {
+      if (error instanceof GraphQLError) {
+        return errorFormatter(error);
+      }
     },
   });
 
-  server.listen(port).then(async ({ url }) => {
-    console.log(url);
+  const { url } = await startStandaloneServer(server, {
+    listen: { port },
+    context,
   });
+
+  console.log(url);
 }
 
 export function stop() {
