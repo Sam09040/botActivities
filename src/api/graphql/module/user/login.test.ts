@@ -6,9 +6,10 @@ import { createUser } from '@test/entity-seed.test';
 import { UserDbDataSource } from '@data/user';
 import { resetDatabase } from '@data/db/seed/reset-database';
 import { getSeedClient } from '@data/db/seed/seed-client';
-const datasource = new UserDbDataSource();
+import Container from 'typedi';
 
 describe('UserResolver - Login', () => {
+  const datasource = Container.get(UserDbDataSource);
   before('Begin services', async () => {
     await connectServer();
     await connectDb();

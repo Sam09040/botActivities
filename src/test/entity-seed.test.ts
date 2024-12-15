@@ -2,11 +2,12 @@ import { BcryptService } from '@core/security/bcrypt';
 import { AddressDbDataSource } from '@data/address';
 import { UserDbDataSource } from '@data/user';
 import { AddressInputModel, AddressModel, UserInputModel, UserModel } from '@domain/model';
-const userDatasource = new UserDbDataSource();
-const addressDatasource = new AddressDbDataSource();
-const bcryptService = new BcryptService();
+import Container from 'typedi';
+
 
 export async function createUser(): Promise<UserModel> {
+  const userDatasource = Container.get(UserDbDataSource);
+  const bcryptService = Container.get(BcryptService);
   const user: UserInputModel = {
     name: 'Sam de Almeida',
     email: 'sam@example.com',
@@ -17,6 +18,7 @@ export async function createUser(): Promise<UserModel> {
 }
 
 export async function createAddress(userId: number = 1): Promise<AddressModel> {
+  const addressDatasource = Container.get(AddressDbDataSource);
   const address: AddressInputModel = {
     userId,
     cep: '12345-678',

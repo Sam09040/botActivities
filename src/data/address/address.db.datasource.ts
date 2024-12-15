@@ -1,6 +1,8 @@
+import { Service } from 'typedi';
 import { dbClient } from '../db/config/db.client';
 import { AddressInputModel, AddressModel } from '@domain/model';
 
+@Service()
 export class AddressDbDataSource {
   insert(input: AddressInputModel): Promise<AddressModel> {
     return dbClient.address.create({ data: input });

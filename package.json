@@ -43,7 +43,8 @@
     "joi": "17.13.3",
     "reflect-metadata": "0.2.2",
     "tsconfig-paths": "4.2.0",
-    "type-graphql": "2.0.0-rc.2"
+    "type-graphql": "2.0.0-rc.2",
+    "typedi": "0.10.0"
   },
   "devDependencies": {
     "@apollo/client": "3.11.10",

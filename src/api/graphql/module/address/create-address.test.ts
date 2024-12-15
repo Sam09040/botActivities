@@ -7,10 +7,11 @@ import { resetDatabase } from '@data/db/seed/reset-database';
 import { checkAddress, checkError } from '@test/checker.test';
 import { requestMaker } from '@test/request-maker';
 import { createUser } from '@test/entity-seed.test';
-const userDbDataSource = new UserDbDataSource();
-const addressDbDataSource = new AddressDbDataSource();
+import Container from 'typedi';
 
 describe('AddressResolver - CreateAddress', () => {
+  const userDbDataSource = Container.get(UserDbDataSource);
+  const addressDbDataSource = Container.get(AddressDbDataSource);
   const mutation = `
     mutation createAddress($data: AddressInput!){
       createAddress(data: $data) {

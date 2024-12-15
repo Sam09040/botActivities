@@ -4,7 +4,7 @@ import { isDefined } from './utils/is-defined';
 import { AdditionalInfo } from '@graphql/graphql-error.formatter';
 import { AddressModel, LoginModel, UserModel } from '@domain/model';
 import { JwtService } from '@core/security/jwt';
-const jwtService = new JwtService();
+import Container from 'typedi';
 
 export function checkError(
   res: GraphqlResponse<any>,
@@ -40,6 +40,7 @@ export function checkAddress(response: AddressModel, address: AddressModel) {
 }
 
 export function checkLogin(response: LoginModel, user: UserModel) {
+  const jwtService = Container.get(JwtService);
   const decoded = jwtService.verify(response.token);
   const expiration = decoded.iat! + 60 * 60;
   isDefined(decoded);
