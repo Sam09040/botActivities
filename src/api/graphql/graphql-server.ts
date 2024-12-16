@@ -7,12 +7,14 @@ import { buildSchema } from 'type-graphql';
 import { UserResolver } from './module/user/user.resolver';
 import { AddressResolver } from './module/address/address.resolver';
 import { GraphQLError } from 'graphql';
+import Container from 'typedi';
 import { AuthorizationMiddleware } from './auth.middleware';
 let server: ApolloServer;
 
 export async function run() {
   const schema = await buildSchema({
     resolvers: [UserResolver, AddressResolver],
+    container: Container,
     authChecker: AuthorizationMiddleware,
     validate: true
   });

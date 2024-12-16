@@ -12,10 +12,10 @@ import { CreateUserUseCase, LoginUseCase, UsersUseCase, UserUseCase } from '@dom
 @Resolver()
 export class UserResolver {
   constructor(
-    private readonly userUseCase = Container.get(UserUseCase),
-    private readonly loginUseCase = Container.get(LoginUseCase),
-    private readonly usersUseCase = Container.get(UsersUseCase),
-    private readonly createUserUseCase = Container.get(CreateUserUseCase)
+    private readonly userUseCase: UserUseCase,
+    private readonly loginUseCase: LoginUseCase,
+    private readonly usersUseCase: UsersUseCase,
+    private readonly createUserUseCase: CreateUserUseCase
   ) {}
 
   @Query(() => String, { description: 'Hello test' })
