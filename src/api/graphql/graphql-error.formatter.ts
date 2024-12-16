@@ -1,7 +1,7 @@
 import { BaseError, ErrorType } from '@core/error';
-import { ApolloServerErrorCode } from '@apollo/server/errors';
-import { GraphQLError } from 'graphql';
-import { ValidationError } from 'apollo-server';
+import { ApolloServerErrorCode, unwrapResolverError } from '@apollo/server/errors';
+import { ValidationError } from 'class-validator';
+import { GraphQLFormattedError } from 'graphql';
 
 export interface ServerError {
   code?: number;
@@ -14,24 +14,38 @@ export interface AdditionalInfo {
   reason?: string;
 }
 
-export function errorFormatter(error: GraphQLError) {
-  const { originalError } = error;
-  if (originalError instanceof BaseError) {
-    const { code, message, additionalInfo } = originalError;
+function parseValidationError(errors: ValidationError[]) {
+  return errors.map((validationError) => ({
+    property: validationError.property,
+    constraints: validationError.constraints
+  }));
+}
+
+export function errorFormatter(formattedError: GraphQLFormattedError, error: unknown) {
+  const unwrappedError = unwrapResolverError(error);
+  if (unwrappedError instanceof BaseError) {
+    const { code, message, additionalInfo } = unwrappedError;
     return {
       code,
       message,
       additionalInfo,
     };
   }
-
-  if (error.extensions?.code === ApolloServerErrorCode.BAD_USER_INPUT) {
+  if(formattedError.extensions?.code === ApolloServerErrorCode.BAD_USER_INPUT) {
+    const validationErrors = formattedError.extensions?.validationErrors;
+    if (!validationErrors) {
+      return {
+        message: 'Check the fields again! Some may be missing!',
+        code: ErrorType.InvalidDataError,
+        additionalInfo: formattedError.extensions?.additionalInfo,
+      };
+    }
     return {
-      message: 'Check the fields again! Some may be missing!',
+      message: 'Check the fields again! They might be wrong or missing.',
       code: ErrorType.InvalidDataError,
-      additionalInfo: error.extensions?.code,
+      additionalInfo: parseValidationError(validationErrors as ValidationError[])
     };
   }
 
-  return error;
+  return formattedError;
 }

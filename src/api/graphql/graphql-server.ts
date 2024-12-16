@@ -1,28 +1,25 @@
-import { gql } from 'apollo-server';
+import 'reflect-metadata';
 import { ApolloServer } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
-import { readFileSync } from 'fs';
 import { context } from './server.context';
 import { errorFormatter } from './graphql-error.formatter';
 import { buildSchema } from 'type-graphql';
 import { UserResolver } from './module/user/user.resolver';
 import { AddressResolver } from './module/address/address.resolver';
 import { GraphQLError } from 'graphql';
-const typeDefs = gql(readFileSync('./src/api/graphql/schema.graphql', 'utf8'));
+import { AuthorizationMiddleware } from './auth.middleware';
 let server: ApolloServer;
 
 export async function run() {
   const schema = await buildSchema({
     resolvers: [UserResolver, AddressResolver],
+    authChecker: AuthorizationMiddleware,
+    validate: true
   });
   const port = Number(process.env.PORT);
   server = new ApolloServer({
     schema,
-    formatError: (_, error) => {
-      if (error instanceof GraphQLError) {
-        return errorFormatter(error);
-      }
-    },
+    formatError: errorFormatter,
   });
 
   const { url } = await startStandaloneServer(server, {

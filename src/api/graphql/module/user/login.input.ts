@@ -1,14 +1,16 @@
 import { LoginInputModel } from '@domain/model';
-import { IsEmail } from 'class-validator';
+import { IsEmail, IsNotEmpty } from 'class-validator';
 import { Field, InputType } from 'type-graphql';
 
 @InputType({ description: 'Infos to login' })
 export class LoginInput implements LoginInputModel {
   @Field({ description: 'E-mail' })
+  @IsNotEmpty({ message: 'Email must be provided' })
   @IsEmail(undefined, { message: 'Invalid email' })
   email: string;
 
   @Field({ description: 'Password' })
+  @IsNotEmpty({ message: 'Password must be provided' })
   password: string;
 
   @Field({ description: 'Remember Me' })
