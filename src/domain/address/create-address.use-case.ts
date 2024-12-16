@@ -33,8 +33,7 @@ export class CreateAddressUseCase {
         reason: 'All fields are required! (Except complement)',
       });
     }
-
-    const address = await this.addressDatasource.insert(input);
-    return address;
+  
+    return this.addressDatasource.insert(input);
   }
 }

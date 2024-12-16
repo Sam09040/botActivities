@@ -5,7 +5,7 @@ import { PageInput } from '@graphql/common';
 import { UserInput } from './user.input';
 import { Login } from './login.type';
 import { LoginInput } from './login.input';
-import Container, { Service } from 'typedi';
+import { Service } from 'typedi';
 import { CreateUserUseCase, LoginUseCase, UsersUseCase, UserUseCase } from '@domain/user';
 
 @Service()
@@ -25,8 +25,8 @@ export class UserResolver {
 
   @Query(() => User, { description: 'Get user by id' })
   @Authorized()
-  async user(@Arg('id', () => Int) id: number, @Ctx() context: ServerContext) {
-    return await this.userUseCase?.exec(id, context.token);
+  user(@Arg('id', () => Int) id: number, @Ctx() context: ServerContext) {
+    return this.userUseCase.exec(id, context.token);
   }
 
   @Query(() => Users, { description: 'Get users' })
