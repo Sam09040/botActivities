@@ -1,6 +1,8 @@
 import { ErrorType, StatusCode } from './error.type';
 
+export const BaseErrorToken = Symbol();
 export class BaseError<T = any> extends Error {
+  [BaseErrorToken] = true;
   code: ErrorType | StatusCode;
   additionalInfo?: T;
 
@@ -10,4 +12,8 @@ export class BaseError<T = any> extends Error {
     this.additionalInfo = additionalInfo;
     Object.setPrototypeOf(this, BaseError.prototype);
   }
+}
+
+export function isBaseError(error: any): error is BaseError {
+  return error?.[BaseErrorToken] ?? false;
 }

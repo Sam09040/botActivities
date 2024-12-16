@@ -1,4 +1,4 @@
-import { InvalidDataError, NotFoundError, UnauthorizedError } from '@core/error';
+import { NotFoundError, UnauthorizedError } from '@core/error';
 import { BcryptService } from '@core/security/bcrypt';
 import { JwtService } from '@core/security/jwt';
 import { UserDbDataSource } from '@data/user';
@@ -10,13 +10,6 @@ const bcryptService = new BcryptService();
 
 export async function loginUseCase(input: LoginInputModel): Promise<LoginModel> {
   const { email, password, rememberMe } = input;
-  if (!email || !password) {
-    throw new InvalidDataError('Invalid email or password', {
-      field: 'email or password',
-      reason: 'You must provide a valid email and password',
-    });
-  }
-
   const user = await datasource.findOneByEmail(email);
 
   if (!user) {

@@ -6,10 +6,10 @@ export const resolvers = {
   Query: {
     hello: (): string => 'hello!',
     ...userResolver.Query,
-    address: addressResolver.Query.address,
+    ...addressResolver.Query,
   },
   Mutation: {
     ...userResolver.Mutation,
-    createAddress: addressResolver.Mutation.createAddress,
+    ...addressResolver.Mutation,
   },
 };

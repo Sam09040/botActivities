@@ -1,4 +1,4 @@
-import { ApolloServer, AuthenticationError, gql } from 'apollo-server';
+import { ApolloServer, gql } from 'apollo-server';
 import { readFileSync } from 'fs';
 import { ContextType } from './context-type';
 import { resolvers } from './resolvers';

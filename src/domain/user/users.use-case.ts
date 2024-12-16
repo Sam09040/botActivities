@@ -1,21 +1,10 @@
-import { UnauthorizedError } from '@core/error';
-import { buildPageInfo, PageInfoModel, PageInputModel } from '@core/pagination';
-import { JwtService } from '@core/security/jwt';
+import { buildPageInfo, PageInputModel } from '@core/pagination';
 import { UserDbDataSource } from '@data/user';
 
 const datasource = new UserDbDataSource();
-const jwtService = new JwtService();
 
-export async function usersUseCase({ input }: PageInputModel, token: string | undefined) {
+export async function usersUseCase({ input }: PageInputModel) {
   let { skip, limit } = input;
-  if (!token) {
-    throw new UnauthorizedError('Token is required for this operation!', {
-      field: 'authorization',
-      reason: 'A valid token must be provided.',
-    });
-  }
-
-  jwtService.verify(token);
 
   const totalUsers = await datasource.count();
   const pageInfo = buildPageInfo({ input }, totalUsers);

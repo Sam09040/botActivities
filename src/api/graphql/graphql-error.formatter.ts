@@ -1,5 +1,7 @@
-import { BaseError } from '@core/error';
+import { BaseError, ErrorType } from '@core/error';
+import { ApolloServerErrorCode } from '@apollo/server/errors';
 import { GraphQLError } from 'graphql';
+import { ValidationError } from 'apollo-server';
 
 export interface ServerError {
   code?: number;
@@ -22,5 +24,14 @@ export function errorFormatter(error: GraphQLError) {
       additionalInfo,
     };
   }
+
+  if (error.extensions?.code === ApolloServerErrorCode.BAD_USER_INPUT) {
+    return {
+      message: 'Check the fields again! Some may be missing!',
+      code: ErrorType.InvalidDataError,
+      additionalInfo: error.extensions?.code,
+    };
+  }
+
   return error;
 }

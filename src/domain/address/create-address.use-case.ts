@@ -1,4 +1,4 @@
-import { InvalidDataError, NotFoundError } from '@core/error';
+import { NotFoundError } from '@core/error';
 import { AddressDbDataSource } from '@data/address';
 import { UserDbDataSource } from '@data/user';
 import { AddressInputModel, AddressModel } from '@domain/model';
@@ -12,15 +12,6 @@ export async function createAddressUseCase(input: AddressInputModel): Promise<Ad
     throw new NotFoundError('User not found!', {
       field: 'userId',
       reason: 'The user you provided does not exist.',
-    });
-  }
-
-  const { cep, street, streetNumber, neighborhood, city, state } = input;
-
-  if (!cep || !street || !streetNumber || !neighborhood || !city || !state) {
-    throw new InvalidDataError('Invalid input!', {
-      field: 'data',
-      reason: 'All fields are required! (Except complement)',
     });
   }
 
