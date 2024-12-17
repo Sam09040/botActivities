@@ -1,4 +1,4 @@
-const modules = {
+module.exports = {
   trailingComma: 'all',
   singleQuote: true,
   printWidth: 120,
@@ -6,5 +6,3 @@ const modules = {
   bracketSpacing: true,
   semi: true,
 };
-
-export default modules;
