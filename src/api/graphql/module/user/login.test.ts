@@ -1,11 +1,7 @@
-import { connectServer, connectDb } from '@test/utils/connect.util';
-import { disconnectServer, disconnectDb } from '@test/utils/disconnect.util';
-import { requestMaker } from '@test/request-maker';
-import { checkError, checkLogin } from '@test/checker.test';
-import { createUser } from '@test/entity-seed.test';
 import { UserDbDataSource } from '@data/user';
-import { resetDatabase } from '@data/db/seed/reset-database';
-import { getSeedClient } from '@data/db/seed/seed-client';
+import { resetDatabase, getSeedClient } from '@data/db/seed';
+import { requestMaker, checkError, checkLogin, createUser } from '@test';
+import { connectServer, connectDb, disconnectServer, disconnectDb } from '@test/utils';
 import Container from 'typedi';
 
 describe('UserResolver - Login', () => {

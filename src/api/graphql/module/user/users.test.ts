@@ -1,16 +1,10 @@
 import { expect } from 'chai';
-import { resetDatabase } from '@data/db/seed/reset-database';
-import { getSeedClient } from '@data/db/seed/seed-client';
-import { UserDbDataSource } from '@data/user';
 import { AddressDbDataSource } from '@data/address';
+import { UserDbDataSource } from '@data/user';
+import { resetDatabase, getSeedClient, Seed } from '@data/db/seed';
 import { UserModel } from '@domain/model';
-import { connectServer, connectDb } from '@test/utils/connect.util';
-import { disconnectServer, disconnectDb } from '@test/utils/disconnect.util';
-import { getToken } from '@test/utils/get-token.util';
-import { createUser } from '@test/entity-seed.test';
-import { requestMaker } from '@test/request-maker';
-import { checkAddress, checkError, checkUser } from '@test/checker.test';
-import { Seed } from '@data/db/seed/define-seed';
+import { checkAddress, checkError, checkUser, requestMaker, createUser } from '@test';
+import { disconnectServer, disconnectDb, connectServer, connectDb, getToken } from '@test/utils';
 import Container from 'typedi';
 
 describe('UserResolver - Users', () => {

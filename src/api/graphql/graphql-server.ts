@@ -1,6 +1,10 @@
 import 'reflect-metadata';
+import express from 'express';
+import http from 'http';
+import cors from 'cors';
 import { ApolloServer } from '@apollo/server';
-import { startStandaloneServer } from '@apollo/server/standalone';
+import { expressMiddleware } from '@apollo/server/express4';
+import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer'
 import { context } from './server.context';
 import { errorFormatter } from './graphql-error.formatter';
 import { buildSchema } from 'type-graphql';
@@ -9,9 +13,13 @@ import { AddressResolver } from './module/address/address.resolver';
 import { GraphQLError } from 'graphql';
 import Container from 'typedi';
 import { AuthorizationMiddleware } from './auth.middleware';
+import { graphqlUploadExpress } from 'graphql-upload-ts';
 let server: ApolloServer;
 
 export async function run() {
+  const app = express();
+  const httpServer = http.createServer(app);
+
   const schema = await buildSchema({
     resolvers: [UserResolver, AddressResolver],
     container: Container,
@@ -22,14 +30,27 @@ export async function run() {
   server = new ApolloServer({
     schema,
     formatError: errorFormatter,
+    plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+    csrfPrevention: true
   });
 
-  const { url } = await startStandaloneServer(server, {
-    listen: { port },
-    context,
-  });
+  await server.start();
 
-  console.log(url);
+  app.use(
+    '/graphql',
+    cors({ origin: '*', credentials: true }),
+    graphqlUploadExpress({
+      maxFiles: 10,
+    }),
+    express.json(),
+    expressMiddleware(server, {
+      context,
+    }),
+  );
+
+  app.listen(port);
+  console.log(`Server ready at http://localhost:${port}/`);
+
 }
 
 export function stop() {

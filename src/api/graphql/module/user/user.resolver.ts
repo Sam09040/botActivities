@@ -6,7 +6,8 @@ import { UserInput } from './user.input';
 import { Login } from './login.type';
 import { LoginInput } from './login.input';
 import { Service } from 'typedi';
-import { CreateUserUseCase, LoginUseCase, UsersUseCase, UserUseCase } from '@domain/user';
+import { CreateUserUseCase, CreateManyUseCase, LoginUseCase, UsersUseCase, UserUseCase } from '@domain/user';
+import { FileUpload, GraphQLUpload } from 'graphql-upload-ts';
 
 @Service()
 @Resolver()
@@ -15,7 +16,8 @@ export class UserResolver {
     private readonly userUseCase: UserUseCase,
     private readonly loginUseCase: LoginUseCase,
     private readonly usersUseCase: UsersUseCase,
-    private readonly createUserUseCase: CreateUserUseCase
+    private readonly createUserUseCase: CreateUserUseCase,
+    private readonly createManyUseCase = CreateManyUseCase
   ) {}
 
   @Query(() => String, { description: 'Hello test' })
@@ -44,5 +46,11 @@ export class UserResolver {
   @Mutation(() => Login, { description: 'Authenticate user' })
   login(@Arg('data') data: LoginInput) {
     return this.loginUseCase.exec(data);
+  }
+
+  @Mutation(() => String)
+  async uploadCsv(@Arg('file', () => GraphQLUpload) file: FileUpload): Promise<string> {
+    await this.createManyUseCase.exec(file);
+    return 'Upload ended successfully! Check the database to see the uploaded info.';
   }
 }

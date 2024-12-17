@@ -11,6 +11,7 @@ export class CreateUserUseCase {
     private readonly bcryptService: BcryptService,
     private readonly jwtService: JwtService,
     private readonly datasource: UserDbDataSource,
+    private readonly validatePasswordUseCase: ValidatePasswordUseCase
   ) {}
 
   async exec (input: UserInputModel, token: string | undefined): Promise<UserModel> {
@@ -39,7 +40,7 @@ export class CreateUserUseCase {
      });
    }
  
-   const isValid = ValidatePasswordUseCase.exec(password);
+   const isValid = this.validatePasswordUseCase.exec(password);
    if (isValid !== null) {
      throw new InvalidDataError(isValid, {
        field: 'password',

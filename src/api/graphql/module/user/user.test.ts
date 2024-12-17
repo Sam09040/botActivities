@@ -1,12 +1,7 @@
-import { connectServer, connectDb } from '@test/utils/connect.util';
-import { disconnectServer, disconnectDb } from '@test/utils/disconnect.util';
-import { getToken } from '@test/utils/get-token.util';
-import { resetDatabase } from '@data/db/seed/reset-database';
-import { getSeedClient } from '@data/db/seed/seed-client';
-import { createAddress, createUser } from '@test/entity-seed.test';
+import { resetDatabase, getSeedClient } from '@data/db/seed';
 import { UserModel } from '@domain/model';
-import { requestMaker } from '@test/request-maker';
-import { checkAddress, checkError, checkUser } from '@test/checker.test';
+import { createAddress, createUser, requestMaker, checkAddress, checkError, checkUser } from '@test';
+import { connectServer, connectDb, disconnectDb, disconnectServer, getToken } from '@test/utils';
 
 describe('UserResolver - User', () => {
   const port = process.env.PORT;

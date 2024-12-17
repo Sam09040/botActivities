@@ -8,6 +8,19 @@ export interface UserModel {
   addresses: Array<AddressModel>;
 }
 
+export interface CsvInputModel {
+  name: string;
+  email: string;
+  birthDate: string;
+  cep: string;
+  street: string;
+  streetNumber: string;
+  complement?: string;
+  neighborhood: string;
+  city: string;
+  state: string;
+}
+
 export interface UserInputModel {
   name: string;
   email: string;

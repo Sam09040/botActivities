@@ -1,12 +1,9 @@
-import { connectDb, connectServer } from '@test/utils/connect.util';
-import { disconnectDb, disconnectServer } from '@test/utils/disconnect.util';
-import { getToken } from '@test/utils/get-token.util';
-import { UserDbDataSource } from '@data/user';
-import { resetDatabase } from '@data/db/seed/reset-database';
-import { getSeedClient } from '@data/db/seed/seed-client';
-import { requestMaker } from '@test/request-maker';
-import { checkError, checkUser } from '@test/checker.test';
-import { createUser } from '@test/entity-seed.test';
+import { resetDatabase, getSeedClient } from "@data/db/seed";
+import { UserDbDataSource } from "@data/user";
+import { UserInputModel } from "@domain/model";
+import { createUser, requestMaker, checkUser, checkError } from "@test";
+import { connectServer, connectDb, getToken, disconnectServer, disconnectDb } from "@test/utils";
+
 const datasource = new UserDbDataSource();
 
 describe('UserResolver - CreateUser', () => {

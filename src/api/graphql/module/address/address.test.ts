@@ -1,12 +1,8 @@
 import { AddressDbDataSource } from '@data/address';
-import { resetDatabase } from '@data/db/seed/reset-database';
-import { getSeedClient } from '@data/db/seed/seed-client';
+import { resetDatabase, getSeedClient } from '@data/db/seed';
 import { UserDbDataSource } from '@data/user';
-import { checkAddress } from '@test/checker.test';
-import { createUser } from '@test/entity-seed.test';
-import { requestMaker } from '@test/request-maker';
-import { connectServer, connectDb } from '@test/utils/connect.util';
-import { disconnectServer, disconnectDb } from '@test/utils/disconnect.util';
+import { createUser, requestMaker, checkAddress } from '@test';
+import { connectServer, connectDb, disconnectServer, disconnectDb } from '@test/utils';
 import Container from 'typedi';
 
 describe('AddressResolver - Address', () => {

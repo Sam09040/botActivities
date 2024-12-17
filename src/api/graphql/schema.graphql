@@ -9,7 +9,10 @@ type Mutation {
     createUser(data: UserInput!): User!
     createAddress(data: AddressInput!): Address!
     login(data: LoginInput!): AuthPayload!
+    uploadCsv(file: Upload!): String
 }
+
+scalar Upload
 
 type User {
     id: ID!

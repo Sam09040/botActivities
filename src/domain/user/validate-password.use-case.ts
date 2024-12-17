@@ -1,35 +1,36 @@
-import 'dotenv/config';
-const PASSWORD_MIN_LENGTH: number = Number(process.env.PASSWORD_MIN_LENGTH);
+import { PASSWORD_MIN_LENGTH } from "@core/security/crypto";
+import Container, { Inject, Service } from "typedi";
 
-function hasDigit(value?: string): boolean {
-  return value?.search(/\d/) !== -1;
-}
-
-function hasLetter(value?: string): boolean {
-  return value?.search(/[a-zA-Z]/) !== -1;
-}
-
-function hasValidLength(value?: string): boolean {
-  const length = value?.length ?? 0;
-  return length >= PASSWORD_MIN_LENGTH;
-}
-
-function validate(value?: string): string | null {
-  if (!hasValidLength(value)) {
-    return 'password must be at least ' + PASSWORD_MIN_LENGTH;
+@Service()
+export class ValidatePasswordUseCase {
+  constructor(@Inject(PASSWORD_MIN_LENGTH) private readonly minLength: number){}
+  
+  hasDigit(value?: string): boolean {
+    return value?.search(/\d/) !== -1;
   }
-
-  if (!hasDigit(value)) {
-    return 'password must have a number';
+  
+  hasLetter(value?: string): boolean {
+    return value?.search(/[a-zA-Z]/) !== -1;
   }
-
-  if (!hasLetter(value)) {
-    return 'password must have a letter';
+  
+  hasValidLength(value?: string): boolean {
+    const length = value?.length ?? 0;
+    return length >= this.minLength;
   }
-
-  return null;
-}
-
-export const ValidatePasswordUseCase = {
-  exec: validate,
-};
+  
+  exec(value?: string): string | null {
+    if (!this.hasValidLength(value)) {
+      return 'password must be at least ' + this.minLength;
+    }
+  
+    if (!this.hasDigit(value)) {
+      return 'password must have a number';
+    }
+  
+    if (!this.hasLetter(value)) {
+      return 'password must have a letter';
+    }
+  
+    return null;
+  }
+} 
