@@ -1,7 +1,9 @@
 import { User } from '@prisma/client';
 import { UserInputModel, UserModel } from '@domain/model';
 import { dbClient } from '../db/config/db.client';
+import { Service } from 'typedi';
 
+@Service()
 export class UserDbDataSource {
   insert(input: UserInputModel): Promise<UserModel> {
     return dbClient.user.create({ data: input, include: { addresses: true } });

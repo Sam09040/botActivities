@@ -1,6 +1,7 @@
 import { decode, sign, verify } from 'jsonwebtoken';
 import { JWT_EXPIRATION_TIME, JWT_SECRET } from './jwt.config';
 import { UnauthorizedError } from '@core/error';
+import { Inject, Service } from 'typedi';
 
 export interface JwtToken<T = any> {
   data: T;
@@ -8,10 +9,11 @@ export interface JwtToken<T = any> {
   exp: number;
 }
 
+@Service()
 export class JwtService {
   constructor(
-    private readonly tokenExpiration: string = JWT_EXPIRATION_TIME,
-    private readonly secret: string = JWT_SECRET,
+    @Inject(JWT_SECRET) private readonly secret: string,
+    @Inject(JWT_EXPIRATION_TIME) private readonly tokenExpiration: string
   ) {}
 
   public decode<T>(token: string): JwtToken<T> {

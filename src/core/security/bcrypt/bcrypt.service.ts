@@ -1,8 +1,10 @@
 import bcrypt from 'bcrypt';
 import { SALT } from './bcrypt.config';
+import { Inject, Service } from 'typedi';
 
+@Service()
 export class BcryptService {
-  constructor(private salt: number = SALT) {}
+  constructor(@Inject(SALT) private salt: number) {}
 
   encrypt(password: string): Promise<string> {
     return bcrypt.hash(password, this.salt);

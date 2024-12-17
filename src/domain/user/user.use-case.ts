@@ -1,15 +1,32 @@
 import { NotFoundError } from '@core/error';
 import { UserDbDataSource } from '@data/user';
+import { UserModel } from '@domain/model';
+import { Service } from 'typedi';
 
-const datasource = new UserDbDataSource();
+@Service()
+export class UserUseCase {
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly datasource: UserDbDataSource
+  ) {}
 
-export async function userUseCase(userId: number) {
-  const user = await datasource.findOneById(userId);
-  if (!user) {
-    throw new NotFoundError('User not found!', {
-      field: 'id',
-      reason: 'The provided id does not exist.',
-    });
+  async exec (userId: number, token: string | undefined): Promise<UserModel> {
+    if (!token) {
+      throw new UnauthorizedError('Token is required for this operation!', {
+        field: 'authorization',
+        reason: 'A valid token must be provided.',
+      });
+    }
+  
+    this.jwtService.verify(token);
+  
+    const user = await this.datasource.findOneById(userId);
+    if (!user) {
+      throw new NotFoundError('User not found!', {
+        field: 'id',
+        reason: 'The provided id does not exist.',
+      });
+    }
+    return user;
   }
-  return user;
 }

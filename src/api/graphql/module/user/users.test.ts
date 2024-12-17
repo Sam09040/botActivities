@@ -1,7 +1,6 @@
 import { expect } from 'chai';
 import { resetDatabase } from '@data/db/seed/reset-database';
 import { getSeedClient } from '@data/db/seed/seed-client';
-import { seedDb } from '@data/db/seed/define-seed';
 import { UserDbDataSource } from '@data/user';
 import { AddressDbDataSource } from '@data/address';
 import { UserModel } from '@domain/model';
@@ -11,10 +10,13 @@ import { getToken } from '@test/utils/get-token.util';
 import { createUser } from '@test/entity-seed.test';
 import { requestMaker } from '@test/request-maker';
 import { checkAddress, checkError, checkUser } from '@test/checker.test';
-const userDatasource = new UserDbDataSource();
-const addressDatasource = new AddressDbDataSource();
+import { Seed } from '@data/db/seed/define-seed';
+import Container from 'typedi';
 
 describe('UserResolver - Users', () => {
+  const userDatasource = Container.get(UserDbDataSource);
+  const addressDatasource = Container.get(AddressDbDataSource);
+  const seed = Container.get(Seed);
   const query = `
   query users($input: PageInput!){
     users(input: $input) {
@@ -77,7 +79,7 @@ describe('UserResolver - Users', () => {
     headers = {
       token,
     };
-    await seedDb();
+    await seed.seedDb();
     const variables = {
       input: {
         skip: 40,
@@ -96,7 +98,7 @@ describe('UserResolver - Users', () => {
     headers = {
       token,
     };
-    await seedDb();
+    await seed.seedDb();
     const variables = {
       input: {
         skip: 10,
@@ -115,7 +117,7 @@ describe('UserResolver - Users', () => {
     headers = {
       token,
     };
-    await seedDb(19);
+    await seed.seedDb(19);
     const variables = {
       input: {
         skip: 20,
@@ -135,7 +137,7 @@ describe('UserResolver - Users', () => {
     headers = {
       token,
     };
-    await seedDb(10);
+    await seed.seedDb(10);
     const variables = {
       input: {
         skip: 7,

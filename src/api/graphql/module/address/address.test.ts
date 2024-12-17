@@ -7,10 +7,11 @@ import { createUser } from '@test/entity-seed.test';
 import { requestMaker } from '@test/request-maker';
 import { connectServer, connectDb } from '@test/utils/connect.util';
 import { disconnectServer, disconnectDb } from '@test/utils/disconnect.util';
-const addressDatasource = new AddressDbDataSource();
-const userDatasource = new UserDbDataSource();
+import Container from 'typedi';
 
 describe('AddressResolver - Address', () => {
+  const addressDatasource = Container.get(AddressDbDataSource);
+  const userDatasource = Container.get(UserDbDataSource);
   const query = `
       query address($userId: Int!){
         address(userId: $userId) {
