@@ -4,9 +4,9 @@ import { resetDatabase } from './reset-database';
 import { getSeedClient } from './seed-client';
 
 const run = async () => {
-    await resetDatabase(await getSeedClient());
-    Container.get(Seed).seedDb();
-}
+  await resetDatabase(await getSeedClient());
+  Container.get(Seed).seedDb();
+};
 
 run();
 console.log('Seed finished successfully!');

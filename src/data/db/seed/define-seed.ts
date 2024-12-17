@@ -7,11 +7,12 @@ import { Service } from 'typedi';
 
 @Service()
 export class Seed {
-  constructor(private readonly bcryptService: BcryptService,
-    private readonly datasource: UserDbDataSource
+  constructor(
+    private readonly bcryptService: BcryptService,
+    private readonly datasource: UserDbDataSource,
   ) {}
 
-  async seedDb (length: number = 50) {
+  async seedDb(length: number = 50) {
     const seed = await getSeedClient();
     const user = await this.datasource.findOneByEmail('sam@example.com');
     if (!user) {
@@ -40,13 +41,13 @@ export class Seed {
         state: 'Estado',
       },
     ]);
-  
+
     const users = Array.from({ length }).map(() => {
       const firstName = faker.person.firstName();
       const lastName = faker.person.lastName();
       const emailLastName = lastName.slice(0, 3).toLowerCase();
       const birthDate = format(faker.date.birthdate({ min: 18, max: 80, mode: 'age' }), 'dd-MM-yyyy');
-  
+
       return {
         name: `${firstName} ${lastName}`,
         email: `${firstName.toLowerCase()}${emailLastName}@example.com`,
@@ -54,7 +55,7 @@ export class Seed {
         birthDate,
       };
     });
-  
+
     for (const user of users) {
       await seed.user([
         {
@@ -78,7 +79,7 @@ export class Seed {
         state: faker.location.state(),
       };
     });
-  
+
     for (const address of addresses) {
       await seed.address([
         {
@@ -94,5 +95,5 @@ export class Seed {
         },
       ]);
     }
-  };
+  }
 }

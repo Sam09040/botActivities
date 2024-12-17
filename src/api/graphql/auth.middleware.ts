@@ -2,9 +2,10 @@ import { AuthChecker } from 'type-graphql';
 import { ServerContext } from './server.context';
 import { UnauthorizedError } from '@core/error';
 import { JwtService } from '@core/security/jwt';
+import Container from 'typedi';
 
 export const AuthorizationMiddleware: AuthChecker<ServerContext> = async ({ context }) => {
-  const jwtService = new JwtService();
+  const jwtService = Container.get(JwtService);
   const { token } = context;
   if (!token) {
     throw new UnauthorizedError('Token is required for this operation!', {

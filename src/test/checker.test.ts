@@ -40,8 +40,7 @@ export function checkAddress(response: AddressModel, address: AddressModel) {
 }
 
 export function checkLogin(response: LoginModel, user: UserModel) {
-  const jwtService = Container.get(JwtService);
-  const decoded = jwtService.verify(response.token);
+  const decoded = Container.get(JwtService).verify<{ userId: number }>(response.token);
   const expiration = decoded.iat! + 60 * 60;
   isDefined(decoded);
   expect(decoded.data.userId).to.equal(user.id);

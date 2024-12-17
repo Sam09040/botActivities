@@ -1,8 +1,8 @@
-import { resetDatabase, getSeedClient } from "@data/db/seed";
-import { UserDbDataSource } from "@data/user";
-import { UserInputModel } from "@domain/model";
-import { createUser, requestMaker, checkUser, checkError } from "@test";
-import { connectServer, connectDb, getToken, disconnectServer, disconnectDb } from "@test/utils";
+import { resetDatabase, getSeedClient } from '@data/db/seed';
+import { UserDbDataSource } from '@data/user';
+import { UserInputModel } from '@domain/model';
+import { createUser, requestMaker, checkUser, checkError } from '@test';
+import { connectServer, connectDb, getToken, disconnectServer, disconnectDb } from '@test/utils';
 
 const datasource = new UserDbDataSource();
 

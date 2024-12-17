@@ -4,13 +4,12 @@ import http from 'http';
 import cors from 'cors';
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
-import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer'
+import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
 import { context } from './server.context';
 import { errorFormatter } from './graphql-error.formatter';
 import { buildSchema } from 'type-graphql';
 import { UserResolver } from './module/user/user.resolver';
 import { AddressResolver } from './module/address/address.resolver';
-import { GraphQLError } from 'graphql';
 import Container from 'typedi';
 import { AuthorizationMiddleware } from './auth.middleware';
 import { graphqlUploadExpress } from 'graphql-upload-ts';
@@ -24,14 +23,14 @@ export async function run() {
     resolvers: [UserResolver, AddressResolver],
     container: Container,
     authChecker: AuthorizationMiddleware,
-    validate: true
+    validate: true,
   });
   const port = Number(process.env.PORT);
   server = new ApolloServer({
     schema,
     formatError: errorFormatter,
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
-    csrfPrevention: true
+    csrfPrevention: true,
   });
 
   await server.start();
@@ -50,7 +49,6 @@ export async function run() {
 
   app.listen(port);
   console.log(`Server ready at http://localhost:${port}/`);
-
 }
 
 export function stop() {

@@ -29,8 +29,8 @@ export class UserDbDataSource {
       where: {
         email: {
           in: emails,
-        }
-      }
+        },
+      },
     });
   }
 

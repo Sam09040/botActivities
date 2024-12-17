@@ -8,6 +8,7 @@ export class AddressInput implements AddressInputModel {
   userId: number;
 
   @Field({ description: 'Cep' })
+  @IsNotEmpty({ message: 'Cep must not be empty' })
   @Length(9, 9, { message: 'Cep must have 8 digits and follow this format: 00000-000' })
   cep: string;
 
@@ -22,8 +23,8 @@ export class AddressInput implements AddressInputModel {
   streetNumber: string;
 
   @Field({ description: 'Complement' })
-  @IsOptional()
   @MaxLength(60, { message: 'Complement must not exceed 60 characters' })
+  @IsOptional()
   complement?: string;
 
   @Field({ description: 'Neighborhood' })

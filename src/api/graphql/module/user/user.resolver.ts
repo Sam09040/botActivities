@@ -1,5 +1,4 @@
-import { ServerContext } from '@graphql/server.context';
-import { Arg, Authorized, Ctx, Int, Mutation, Query, Resolver } from 'type-graphql';
+import { Arg, Authorized, Int, Mutation, Query, Resolver } from 'type-graphql';
 import { User, Users } from './user.type';
 import { PageInput } from '@graphql/common';
 import { UserInput } from './user.input';
@@ -17,7 +16,7 @@ export class UserResolver {
     private readonly loginUseCase: LoginUseCase,
     private readonly usersUseCase: UsersUseCase,
     private readonly createUserUseCase: CreateUserUseCase,
-    private readonly createManyUseCase = CreateManyUseCase
+    private readonly createManyUseCase: CreateManyUseCase,
   ) {}
 
   @Query(() => String, { description: 'Hello test' })
@@ -27,20 +26,20 @@ export class UserResolver {
 
   @Query(() => User, { description: 'Get user by id' })
   @Authorized()
-  user(@Arg('id', () => Int) id: number, @Ctx() context: ServerContext) {
-    return this.userUseCase.exec(id, context.token);
+  user(@Arg('id', () => Int) id: number) {
+    return this.userUseCase.exec(id);
   }
 
   @Query(() => Users, { description: 'Get users' })
   @Authorized()
-  users(@Arg('pageInput') pageInput: PageInput, @Ctx() context: ServerContext) {
-    return this.usersUseCase.exec(pageInput, context.token);
+  users(@Arg('pageInput') pageInput: PageInput) {
+    return this.usersUseCase.exec(pageInput);
   }
 
   @Mutation(() => User, { description: 'Create new user' })
   @Authorized()
-  createUser(@Arg('data') data: UserInput, @Ctx() context: ServerContext) {
-    return this.createUserUseCase.exec(data, context.token);
+  createUser(@Arg('data') data: UserInput) {
+    return this.createUserUseCase.exec(data);
   }
 
   @Mutation(() => Login, { description: 'Authenticate user' })

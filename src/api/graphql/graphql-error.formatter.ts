@@ -17,7 +17,7 @@ export interface AdditionalInfo {
 function parseValidationError(errors: ValidationError[]) {
   return errors.map((validationError) => ({
     property: validationError.property,
-    constraints: validationError.constraints
+    constraints: validationError.constraints,
   }));
 }
 
@@ -31,7 +31,7 @@ export function errorFormatter(formattedError: GraphQLFormattedError, error: unk
       additionalInfo,
     };
   }
-  if(formattedError.extensions?.code === ApolloServerErrorCode.BAD_USER_INPUT) {
+  if (formattedError.extensions?.code === ApolloServerErrorCode.BAD_USER_INPUT) {
     const validationErrors = formattedError.extensions?.validationErrors;
     if (!validationErrors) {
       return {
@@ -43,7 +43,7 @@ export function errorFormatter(formattedError: GraphQLFormattedError, error: unk
     return {
       message: 'Check the fields again! They might be wrong or missing.',
       code: ErrorType.InvalidDataError,
-      additionalInfo: parseValidationError(validationErrors as ValidationError[])
+      additionalInfo: parseValidationError(validationErrors as ValidationError[]),
     };
   }
 

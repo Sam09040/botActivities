@@ -6,9 +6,7 @@ import { RESEND_API_KEY } from './email.config';
 @Service()
 export class EmailService {
   private readonly resend: Resend;
-  constructor(
-    @Inject(RESEND_API_KEY) private readonly apiKey: string,
-  ) {
+  constructor(@Inject(RESEND_API_KEY) private readonly apiKey: string) {
     this.resend = new Resend(this.apiKey);
   }
 

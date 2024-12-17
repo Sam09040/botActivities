@@ -4,21 +4,10 @@ import { Service } from 'typedi';
 
 @Service()
 export class UsersUseCase {
-  constructor(
-    private readonly jwtService: JwtService,
-    private readonly datasource: UserDbDataSource,
-  ) {}
+  constructor(private readonly datasource: UserDbDataSource) {}
 
-  async exec (input: PageInputModel, token: string | undefined) {
+  async exec(input: PageInputModel) {
     let { skip, limit } = input;
-    if (!token) {
-      throw new UnauthorizedError('Token is required for this operation!', {
-        field: 'authorization',
-        reason: 'A valid token must be provided.',
-      });
-    }
-
-    this.jwtService.verify(token);
 
     const totalUsers = await this.datasource.count();
     const pageInfo = buildPageInfo(input, totalUsers);

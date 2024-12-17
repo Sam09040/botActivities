@@ -70,8 +70,8 @@ describe('AddressResolver - Address', () => {
       state: 'State',
     };
 
-    await addressDatasource.insert(data.data);
-    const address = await addressDatasource.insert(variables.data);
+    await addressDatasource.insert(data);
+    const address = await addressDatasource.insert(variables);
 
     const response = await requestMaker<any, { userId: number }>({ query, variables: { userId } });
     checkAddress(response.data.data.address[1], address);

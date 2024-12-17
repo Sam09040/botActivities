@@ -1,4 +1,5 @@
-import { JwtService } from "@core/security/jwt";
+import { JwtService } from '@core/security/jwt';
+import Container from 'typedi';
 
 export interface ServerContext {
   userId: number;
@@ -7,6 +8,6 @@ export interface ServerContext {
 
 export const context = async ({ req }: any): Promise<ServerContext> => {
   const token = req.headers.authorization ?? undefined;
-  const { userId } = new JwtService().decode<ServerContext>(token).data;
+  const { userId } = Container.get(JwtService).decode<ServerContext>(token).data;
   return { userId, token };
 };
