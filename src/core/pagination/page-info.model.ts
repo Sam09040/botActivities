@@ -1,8 +1,12 @@
+export interface Paginated<Model> {
+  nodes: Model[];
+  count: number;
+  pageInfo: Partial<PageInfoModel>;
+}
+
 export interface PageInputModel {
-  input: {
-    skip?: number;
-    limit: number;
-  };
+  skip?: number;
+  limit: number;
 }
 
 export interface PageInfoModel {
@@ -14,7 +18,7 @@ export interface PageInfoModel {
 
 export const DEFAULT_PAGE_SIZE: number = 10;
 
-export function buildPageInfo({ input }: PageInputModel, totalItems: number): PageInfoModel {
+export function buildPageInfo(input: PageInputModel, totalItems: number): PageInfoModel {
   const skip = input.skip ?? 0;
   const limit = input.limit !== 0 ? input.limit : DEFAULT_PAGE_SIZE;
   return {

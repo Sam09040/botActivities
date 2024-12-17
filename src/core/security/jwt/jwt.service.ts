@@ -1,8 +1,8 @@
-import { decode, JwtPayload, sign, verify } from 'jsonwebtoken';
+import { decode, sign, verify } from 'jsonwebtoken';
 import { JWT_EXPIRATION_TIME, JWT_SECRET } from './jwt.config';
 import { UnauthorizedError } from '@core/error';
 
-export interface JwtToken<T> {
+export interface JwtToken<T = any> {
   data: T;
   iat: number;
   exp: number;
@@ -14,9 +14,9 @@ export class JwtService {
     private readonly secret: string = JWT_SECRET,
   ) {}
 
-  public decode(token: string): JwtPayload {
+  public decode<T>(token: string): JwtToken<T> {
     try {
-      return decode(token) as JwtPayload;
+      return decode(token) as JwtToken<T>;
     } catch (error) {
       throw new UnauthorizedError('Invalid JWT token', {
         field: 'authorization',
@@ -25,9 +25,9 @@ export class JwtService {
     }
   }
 
-  public verify(token: string): JwtPayload {
+  public verify<T>(token: string): JwtToken<T> {
     try {
-      return verify(token, this.secret) as JwtPayload;
+      return verify(token, this.secret) as JwtToken<T>;
     } catch (error) {
       throw new UnauthorizedError('Invalid JWT token', {
         field: 'authorization',

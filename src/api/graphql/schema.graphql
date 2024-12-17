@@ -1,5 +1,5 @@
 type Query {
-    address(userId: Int!): [Address]!
+    address: [Address]!
     users(input: PageInput!): UsersPayload!
     user(id: Int!): User!
     hello: String!
