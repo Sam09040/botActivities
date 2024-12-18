@@ -38,7 +38,7 @@ export class CreateManyUseCase {
     const csvData = await this.csvService.validate(file);
 
     if (csvData.length === 0) {
-      throw new InvalidDataError('The file must contain a least one user info', {
+      throw new InvalidDataError('The file must contain at least one user info', {
         field: 'file',
         reason: 'Not enough information',
       });

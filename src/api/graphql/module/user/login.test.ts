@@ -69,7 +69,7 @@ describe('UserResolver - Login', () => {
       },
     };
 
-    const response = await requestMaker<any, any>({ query: mutation, variables }, { token: 'none' });
+    const response = await requestMaker<any, any>({ query: mutation, variables });
     const user = await datasource.findOneByEmail('sam@example.com');
     checkLogin(response.data.data.login, user);
   });

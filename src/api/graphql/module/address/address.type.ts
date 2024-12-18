@@ -6,27 +6,27 @@ export class Address implements AddressModel {
   @Field(() => Int, { description: 'Address id' })
   id: number;
 
-  @Field({ description: 'user id connected to the address' })
+  @Field(() => Int, { description: 'user id connected to the address' })
   userId: number;
 
-  @Field({ description: 'Address cep' })
+  @Field(() => String, { description: 'Address cep' })
   cep: string;
 
-  @Field({ description: 'Address street' })
+  @Field(() => String, { description: 'Address street' })
   street: string;
 
-  @Field({ description: 'Address street number' })
+  @Field(() => String, { description: 'Address street number' })
   streetNumber: string;
 
-  @Field({ description: 'Address complement', nullable: true })
+  @Field(() => String, { description: 'Address complement', nullable: true })
   complement?: string;
 
-  @Field({ description: 'Address neighborhood' })
+  @Field(() => String, { description: 'Address neighborhood' })
   neighborhood: string;
 
-  @Field({ description: 'Address city' })
+  @Field(() => String, { description: 'Address city' })
   city: string;
 
-  @Field({ description: 'Address state' })
+  @Field(() => String, { description: 'Address state' })
   state: string;
 }

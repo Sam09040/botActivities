@@ -4,7 +4,7 @@ import { User } from './user.type';
 
 @ObjectType({ description: 'Login response object' })
 export class Login implements LoginModel {
-  @Field({ description: 'JWT token' })
+  @Field(() => String, { description: 'JWT token' })
   token: string;
 
   @Field(() => User, { description: 'User' })

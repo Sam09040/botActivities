@@ -1,22 +1,20 @@
 import { resetDatabase, getSeedClient } from '@data/db/seed';
 import { UserDbDataSource } from '@data/user';
-import { UserInputModel } from '@domain/model';
 import { createUser, requestMaker, checkUser, checkError } from '@test';
 import { connectServer, connectDb, getToken, disconnectServer, disconnectDb } from '@test/utils';
 
-const datasource = new UserDbDataSource();
-
 describe('UserResolver - CreateUser', () => {
   const mutation = `
-    mutation createUser($data: UserInput!){
-      createUser(data: $data) {
-        id,
-        name,
-        email,
-        birthDate
+  mutation createUser($data: UserInput!){
+    createUser(data: $data) {
+      id,
+      name,
+      email,
+      birthDate
       }
-    }
-  `;
+      }
+      `;
+  const datasource = new UserDbDataSource();
   let token: string | undefined;
 
   before('before', async () => {
@@ -34,9 +32,6 @@ describe('UserResolver - CreateUser', () => {
 
   it('should create an user successfully', async () => {
     await datasource.deleteAll();
-    const headers = {
-      token,
-    };
     const variables = {
       data: {
         name: 'Sam',
@@ -45,7 +40,7 @@ describe('UserResolver - CreateUser', () => {
         birthDate: '09-04-2004',
       },
     };
-    const response = await requestMaker<any, any>({ query: mutation, variables }, headers);
+    const response = await requestMaker<any, any>({ query: mutation, variables, token });
     const user = await datasource.findOneByEmail('sam@example.com');
     checkUser(response.data.data.createUser, user);
   });
@@ -66,10 +61,7 @@ describe('UserResolver - CreateUser', () => {
   });
 
   it('should return an error for invalid token', async () => {
-    const headers = {
-      token: 'none',
-    };
-
+    token = 'none';
     const variables = {
       data: {
         name: 'Jeff',
@@ -79,15 +71,12 @@ describe('UserResolver - CreateUser', () => {
       },
     };
 
-    const response = await requestMaker<any, any>({ query: mutation, variables }, headers);
+    const response = await requestMaker<any, any>({ query: mutation, variables, token });
     const error = response.data.errors[0];
     checkError(response, error.code, error.message, error.additionalInfo);
   });
 
   it('should return an error for existing email', async () => {
-    const headers = {
-      token,
-    };
     const variables = {
       data: {
         name: 'Sam',
@@ -97,15 +86,12 @@ describe('UserResolver - CreateUser', () => {
       },
     };
 
-    const response = await requestMaker<any, any>({ query: mutation, variables }, headers);
+    const response = await requestMaker<any, any>({ query: mutation, variables, token });
     const error = response.data.errors[0];
     checkError(response, error.code, error.message, error.additionalInfo);
   });
 
   it('should return an error for invalid password', async () => {
-    const headers = {
-      token,
-    };
     const variables = {
       data: {
         name: 'Ben',
@@ -115,15 +101,12 @@ describe('UserResolver - CreateUser', () => {
       },
     };
 
-    const response = await requestMaker<any, any>({ query: mutation, variables }, headers);
+    const response = await requestMaker<any, any>({ query: mutation, variables, token });
     const error = response.data.errors[0];
     checkError(response, error.code, error.message, error.additionalInfo);
   });
 
   it('should return an error for invalid input', async () => {
-    const headers = {
-      token,
-    };
     const variables = {
       data: {
         name: '',
@@ -133,7 +116,7 @@ describe('UserResolver - CreateUser', () => {
       },
     };
 
-    const response = await requestMaker<any, any>({ query: mutation, variables }, headers);
+    const response = await requestMaker<any, any>({ query: mutation, variables, token });
     const error = response.data.errors[0];
     checkError(response, error.code, error.message, error.additionalInfo);
   });

@@ -37,7 +37,10 @@ export function errorFormatter(formattedError: GraphQLFormattedError, error: unk
       return {
         message: 'Check the fields again! Some may be missing!',
         code: ErrorType.InvalidDataError,
-        additionalInfo: formattedError.extensions?.additionalInfo,
+        additionalInfo: {
+          field: 'file',
+          reason: 'Fields are missing!'
+        }
       };
     }
     return {

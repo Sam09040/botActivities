@@ -21,7 +21,7 @@ export class AddressResolver {
 
   @Mutation(() => Address, { description: 'Create a new address' })
   @Authorized()
-  async createAddress(@Arg('data') data: AddressInput, @Ctx() { userId }: ServerContext) {
+  async createAddress(@Arg('data', () => AddressInput) data: AddressInput, @Ctx() { userId }: ServerContext) {
     data.userId = userId;
     return this.createAddressUseCase.exec(data);
   }

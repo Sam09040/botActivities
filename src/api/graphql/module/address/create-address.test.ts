@@ -2,7 +2,7 @@ import { AddressDbDataSource } from '@data/address';
 import { resetDatabase, getSeedClient } from '@data/db/seed';
 import { UserDbDataSource } from '@data/user';
 import { createUser, requestMaker, checkError, checkAddress } from '@test';
-import { connectServer, connectDb, disconnectServer, disconnectDb } from '@test/utils';
+import { connectServer, connectDb, disconnectServer, disconnectDb, getToken } from '@test/utils';
 import Container from 'typedi';
 
 describe('AddressResolver - CreateAddress', () => {
@@ -24,6 +24,7 @@ describe('AddressResolver - CreateAddress', () => {
   `;
 
   let userId: number;
+  let token: string;
 
   before('before', async () => {
     await connectServer();
@@ -41,6 +42,7 @@ describe('AddressResolver - CreateAddress', () => {
     if (user) {
       userId = user.id;
     }
+    token = await getToken(user);
   });
 
   afterEach('after each', async () => {
@@ -60,7 +62,7 @@ describe('AddressResolver - CreateAddress', () => {
         userId: 0,
       },
     };
-    const response = await requestMaker({ query: mutation, variables });
+    const response = await requestMaker({ query: mutation, variables, token });
     const error = response.data.errors[0];
     checkError(response, error.code, error.message, error.additionalInfo);
   });
@@ -78,8 +80,8 @@ describe('AddressResolver - CreateAddress', () => {
         userId: userId + 1,
       },
     };
-
-    const response = await requestMaker({ query: mutation, variables }, { token: 'none' });
+    token = 'none';
+    const response = await requestMaker({ query: mutation, variables, token });
     const error = response.data.errors[0];
     checkError(response, error.code, error.message, error.additionalInfo);
   });
@@ -98,7 +100,7 @@ describe('AddressResolver - CreateAddress', () => {
       },
     };
 
-    const response = await requestMaker({ query: mutation, variables });
+    const response = await requestMaker({ query: mutation, variables, token });
     const error = response.data.errors[0];
     checkError(response, error.code, error.message, error.additionalInfo);
   });
@@ -117,7 +119,7 @@ describe('AddressResolver - CreateAddress', () => {
       },
     };
 
-    const response = await requestMaker<any, any>({ query: mutation, variables });
+    const response = await requestMaker<any, any>({ query: mutation, variables, token });
     const address = await addressDbDataSource.findAddresses(userId);
     checkAddress(response.data.data.createAddress, address[0]);
   });

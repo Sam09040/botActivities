@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import express from 'express';
 import http from 'http';
 import cors from 'cors';
+import Container from 'typedi';
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
@@ -10,7 +11,6 @@ import { errorFormatter } from './graphql-error.formatter';
 import { buildSchema } from 'type-graphql';
 import { UserResolver } from './module/user/user.resolver';
 import { AddressResolver } from './module/address/address.resolver';
-import Container from 'typedi';
 import { AuthorizationMiddleware } from './auth.middleware';
 import { graphqlUploadExpress } from 'graphql-upload-ts';
 let server: ApolloServer;
@@ -18,7 +18,7 @@ let server: ApolloServer;
 export async function run() {
   const app = express();
   const httpServer = http.createServer(app);
-
+  
   const schema = await buildSchema({
     resolvers: [UserResolver, AddressResolver],
     container: Container,
@@ -36,7 +36,7 @@ export async function run() {
   await server.start();
 
   app.use(
-    '/graphql',
+    '/',
     cors({ origin: '*', credentials: true }),
     graphqlUploadExpress({
       maxFiles: 10,
@@ -49,6 +49,7 @@ export async function run() {
 
   app.listen(port);
   console.log(`Server ready at http://localhost:${port}/`);
+  return server;
 }
 
 export function stop() {

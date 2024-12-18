@@ -3,6 +3,7 @@ import { AddressDbDataSource } from '@data/address';
 import { UserDbDataSource } from '@data/user';
 import { AddressInputModel, AddressModel, UserInputModel, UserModel } from '@domain/model';
 import Container from 'typedi';
+import bcrypt from 'bcrypt';
 
 export async function createUser(): Promise<UserModel> {
   const user: UserInputModel = {

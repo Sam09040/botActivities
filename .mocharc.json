@@ -1,6 +1,6 @@
 {
-    "extension": [".ts"],
-    "require": ["ts-node/register", "tsx", "tsconfig-paths/register", "chai/register-expect.js"],
+    "extension": ["ts"],
+    "require": ["ts-node/register", "tsconfig-paths/register", "chai/register-expect.js"],
     "watch-files": ["src/**/*.test.ts"],
     "spec": ["src/**/*.test.ts"],
     "timeout": ["5000"]

@@ -36,7 +36,6 @@ describe('UserResolver - Users', () => {
     }
   `;
   let token: string | undefined;
-  let headers = {};
   let user: UserModel;
 
   before('begin services', async () => {
@@ -70,9 +69,6 @@ describe('UserResolver - Users', () => {
   });
 
   it('should return correct values when skip and limit are 0', async () => {
-    headers = {
-      token,
-    };
     await seed.seedDb();
     const variables = {
       input: {
@@ -81,7 +77,7 @@ describe('UserResolver - Users', () => {
       },
     };
 
-    const response = await requestMaker<any, any>({ query, variables }, headers);
+    const response = await requestMaker<any, any>({ query, variables, token });
     checkUser(response.data.data.users.users[1], user);
     const data = response.data.data.users;
     expect(data.page).to.equal(4);
@@ -89,9 +85,6 @@ describe('UserResolver - Users', () => {
   });
 
   it('should return correct values when limit is bigger than users amount', async () => {
-    headers = {
-      token,
-    };
     await seed.seedDb();
     const variables = {
       input: {
@@ -100,7 +93,7 @@ describe('UserResolver - Users', () => {
       },
     };
 
-    const response = await await requestMaker<any, any>({ query, variables }, headers);
+    const response = await await requestMaker<any, any>({ query, variables, token });
     const data = response.data.data.users;
     expect(data.users.length).to.equal(41);
     expect(data.maxPage).to.equal(2);
@@ -108,9 +101,6 @@ describe('UserResolver - Users', () => {
   });
 
   it('should return correct values when skip is bigger than users amount', async () => {
-    headers = {
-      token,
-    };
     await seed.seedDb(19);
     const variables = {
       input: {
@@ -119,7 +109,7 @@ describe('UserResolver - Users', () => {
       },
     };
 
-    const response = await requestMaker<any, any>({ query, variables }, headers);
+    const response = await requestMaker<any, any>({ query, variables, token });
     const data = response.data.data.users;
     expect(data.users.length).to.equal(0);
     expect(data.users).to.deep.equal([]);
@@ -128,9 +118,6 @@ describe('UserResolver - Users', () => {
   });
 
   it('should return users with addresses', async () => {
-    headers = {
-      token,
-    };
     await seed.seedDb(10);
     const variables = {
       input: {
@@ -140,7 +127,7 @@ describe('UserResolver - Users', () => {
     };
 
     const address = await addressDatasource.findAddresses(user.id);
-    const response = await requestMaker<any, any>({ query, variables }, headers);
+    const response = await requestMaker<any, any>({ query, variables, token });
     const data = response.data.data.users.users;
     expect(data[2].name).to.equal(user.name);
     expect(data[2]).to.have.property('addresses');
@@ -148,9 +135,6 @@ describe('UserResolver - Users', () => {
   });
 
   it('should return an empty array for no users', async () => {
-    headers = {
-      token,
-    };
     await userDatasource.deleteAll();
     const variables = {
       input: {
@@ -159,7 +143,7 @@ describe('UserResolver - Users', () => {
       },
     };
 
-    const response = await requestMaker<any, any>({ query, variables }, headers);
+    const response = await requestMaker<any, any>({ query, variables, token });
     const data = response.data.data.users;
     expect(data.users).to.deep.equal([]);
     expect(data.page).to.equals(1);

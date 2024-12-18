@@ -32,18 +32,18 @@ export class UserResolver {
 
   @Query(() => Users, { description: 'Get users' })
   @Authorized()
-  users(@Arg('pageInput') pageInput: PageInput) {
+  users(@Arg('pageInput', () => PageInput) pageInput: PageInput) {
     return this.usersUseCase.exec(pageInput);
   }
 
   @Mutation(() => User, { description: 'Create new user' })
   @Authorized()
-  createUser(@Arg('data') data: UserInput) {
+  createUser(@Arg('data', () => UserInput) data: UserInput) {
     return this.createUserUseCase.exec(data);
   }
 
   @Mutation(() => Login, { description: 'Authenticate user' })
-  login(@Arg('data') data: LoginInput) {
+  login(@Arg('data', () => LoginInput) data: LoginInput) {
     return this.loginUseCase.exec(data);
   }
 

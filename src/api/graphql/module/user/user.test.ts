@@ -49,11 +49,9 @@ describe('UserResolver - User', () => {
       userId: 1,
     };
 
-    const headers = {
-      token: 'none',
-    };
+    token = 'none';
 
-    const response = await requestMaker<any, any>({ query, variables }, headers);
+    const response = await requestMaker<any, any>({ query, variables, token });
     const error = response.data.errors[0];
     checkError(response, error.code, error.message, error.additionalInfo);
   });
@@ -64,11 +62,7 @@ describe('UserResolver - User', () => {
       userId: user.id,
     };
 
-    const headers = {
-      token,
-    };
-
-    const response = await requestMaker<any, any>({ query, variables }, headers);
+    const response = await requestMaker<any, any>({ query, variables, token });
     checkUser(response.data.data.user, user);
   });
 
@@ -102,11 +96,7 @@ describe('UserResolver - User', () => {
       userId: user.id,
     };
 
-    const headers = {
-      token,
-    };
-
-    const response = await requestMaker<any, any>({ query, variables }, headers);
+    const response = await requestMaker<any, any>({ query, variables, token });
     checkUser(response.data.data.user, user);
     checkAddress(response.data.data.user.addresses[0], address);
   });
