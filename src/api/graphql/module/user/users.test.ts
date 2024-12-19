@@ -117,7 +117,7 @@ describe('UserResolver - Users', () => {
     expect(data.maxPage).to.equal(4);
   });
 
-  it.only('should return users with addresses', async () => {
+  it('should return users with addresses', async () => {
     const users = await createUsers(10);
     const ids: number[] = [];
     users.forEach((user) => {
