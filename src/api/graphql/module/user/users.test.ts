@@ -1,20 +1,19 @@
+import 'reflect-metadata';
 import { expect } from 'chai';
 import { AddressDbDataSource } from '@data/address';
 import { UserDbDataSource } from '@data/user';
-import { resetDatabase, getSeedClient, Seed } from '@data/db/seed';
 import { UserModel } from '@domain/model';
-import { checkAddress, checkError, checkUser, requestMaker, createUser } from '@test';
+import { checkAddress, checkError, checkUser, requestMaker, createUser, createUsers, createAddresses, createAddress } from '@test';
 import { disconnectServer, disconnectDb, connectServer, connectDb, getToken } from '@test/utils';
 import Container from 'typedi';
 
 describe('UserResolver - Users', () => {
   const userDatasource = Container.get(UserDbDataSource);
   const addressDatasource = Container.get(AddressDbDataSource);
-  const seed = Container.get(Seed);
   const query = `
   query users($input: PageInput!){
-    users(input: $input) {
-      users{
+    users(pageInput: $input) {
+      users {
           id
           name
           email
@@ -38,21 +37,22 @@ describe('UserResolver - Users', () => {
   let token: string | undefined;
   let user: UserModel;
 
-  before('begin services', async () => {
+  beforeAll(async () => {
     await connectServer();
     await connectDb();
   });
-  after('end services', async () => {
-    await resetDatabase(await getSeedClient());
+  afterAll(async () => {
+    await userDatasource.deleteAll();
     await disconnectServer();
     await disconnectDb();
   });
-  beforeEach('create main user', async () => {
+  beforeEach(async () => {
     user = await createUser();
+    await createAddress(user.id);
     token = await getToken(user);
   });
-  afterEach('refresh db', async () => {
-    await resetDatabase(await getSeedClient());
+  afterEach(async () => {
+    await userDatasource.deleteAll();
   });
 
   it('should return an error for no token', async () => {
@@ -64,12 +64,12 @@ describe('UserResolver - Users', () => {
     };
 
     const response = await requestMaker({ query, variables });
-    const error = response.data.errors[0];
-    checkError(response, error.code, error.message, error.additionalInfo);
+    const error = response.data.errors?.at(0);
+    checkError(response, error?.code, error?.message, error?.additionalInfo);
   });
 
   it('should return correct values when skip and limit are 0', async () => {
-    await seed.seedDb();
+    await createUsers();
     const variables = {
       input: {
         skip: 40,
@@ -78,14 +78,14 @@ describe('UserResolver - Users', () => {
     };
 
     const response = await requestMaker<any, any>({ query, variables, token });
-    checkUser(response.data.data.users.users[1], user);
     const data = response.data.data.users;
+    checkUser(response.data.data.users.users[1], user);
     expect(data.page).to.equal(4);
     expect(data.maxPage).to.equal(5);
   });
 
   it('should return correct values when limit is bigger than users amount', async () => {
-    await seed.seedDb();
+    await createUsers();
     const variables = {
       input: {
         skip: 10,
@@ -101,7 +101,7 @@ describe('UserResolver - Users', () => {
   });
 
   it('should return correct values when skip is bigger than users amount', async () => {
-    await seed.seedDb(19);
+    await createUsers(19);
     const variables = {
       input: {
         skip: 20,
@@ -117,8 +117,13 @@ describe('UserResolver - Users', () => {
     expect(data.maxPage).to.equal(4);
   });
 
-  it('should return users with addresses', async () => {
-    await seed.seedDb(10);
+  it.only('should return users with addresses', async () => {
+    const users = await createUsers(10);
+    const ids: number[] = [];
+    users.forEach((user) => {
+      ids.push(user.id);
+    })
+    await createAddresses(ids);
     const variables = {
       input: {
         skip: 7,
@@ -131,7 +136,7 @@ describe('UserResolver - Users', () => {
     const data = response.data.data.users.users;
     expect(data[2].name).to.equal(user.name);
     expect(data[2]).to.have.property('addresses');
-    checkAddress(data[2], address[0]);
+    checkAddress(data[2].addresses[0], address[0]);
   });
 
   it('should return an empty array for no users', async () => {

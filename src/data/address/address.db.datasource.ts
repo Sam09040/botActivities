@@ -15,7 +15,7 @@ export class AddressDbDataSource {
   async insertMany(addressInput: AddressInputModel[], userId: number[]): Promise<AddressModel[]> {
     const data = addressInput.map((address: AddressInputModel, index: number) => ({
       ...address,
-      userId: userId[index],
+      userId: userId?.[index],
     }));
 
     return await dbClient.address.createManyAndReturn({ data });

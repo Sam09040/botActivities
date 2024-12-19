@@ -18,7 +18,7 @@ interface GraphqlResponseBody<T> {
   errors?: ServerError[];
 }
 
-export async function requestMaker<TData, TVariables>({
+export function requestMaker<TData, TVariables>({
   query,
   token,
   formData,
@@ -26,14 +26,25 @@ export async function requestMaker<TData, TVariables>({
 }: Options<TVariables>): Promise<GraphqlResponse<TData>> {
   const port = process.env.PORT;
   const url = `http://localhost:${port}/`;
-  let headers = {
-    Authorization: '',
-    'Apollo-Require-Preflight': true,
-    'Content-Type': 'multipart/form-data',
-  };
-  token ? (headers.Authorization = token) : (headers.Authorization = '');
-
-  return (await axios.post(url, formData ? formData : { query, variables }, {
-    headers,
-  })) as GraphqlResponse<TData>;
+  let headers = {};
+  if (token) {
+    headers = {
+      Authorization: token,
+    };
+  }
+  if (formData) {
+    headers = {
+      ...headers,
+      'Apollo-Require-Preflight': true,
+      'Content-Type': 'multipart/form-data',
+    };
+    return axios.post(url, formData, { headers });
+  }
+  return axios.post(
+    url,
+    { query, variables },
+    {
+      headers,
+    },
+  );
 }

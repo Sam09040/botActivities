@@ -1,48 +1,41 @@
 import { faker } from '@faker-js/faker';
 import { format } from 'date-fns';
-import { getSeedClient } from './seed-client';
 import { UserDbDataSource } from '@data/user';
 import { BcryptService } from '@core/security/bcrypt';
 import { Service } from 'typedi';
+import { AddressDbDataSource } from '@data/address';
 
 @Service()
 export class Seed {
   constructor(
     private readonly bcryptService: BcryptService,
-    private readonly datasource: UserDbDataSource,
+    private readonly userDatasource: UserDbDataSource,
+    private readonly addressDatasource: AddressDbDataSource,
   ) {}
 
-  async seedDb(length: number = 50) {
-    const seed = await getSeedClient();
-    const user = await this.datasource.findOneByEmail('sam@example.com');
+  async seedDb(length: number = 50): Promise<void> {
+    const user = await this.userDatasource.findOneByEmail('sam@example.com');
     if (!user) {
-      const id = 1;
       const password = await this.bcryptService.encrypt('Sam123');
-      await seed.user([
-        {
-          id,
-          name: 'Sam de Almeida',
-          email: 'sam@example.com',
-          password,
-          birthDate: '09-04-2004',
-        },
-      ]);
+      await this.userDatasource.insert({
+        name: 'Sam de Almeida',
+        email: 'sam@example.com',
+        password,
+        birthDate: '09-04-2004',
+      });
     }
-    await seed.address([
-      {
-        id: 1,
-        userId: 1,
-        cep: '12345-678',
-        street: 'R. Existe',
-        streetNumber: '123A',
-        complement: 'T. Silveira, apt. 512',
-        neighborhood: 'Bairro',
-        city: 'Cidade',
-        state: 'Estado',
-      },
-    ]);
+    await this.addressDatasource.insert({
+      userId: 1,
+      cep: '12345-678',
+      street: 'R. Existe',
+      streetNumber: '123A',
+      complement: 'T. Silveira, apt. 512',
+      neighborhood: 'Bairro',
+      city: 'Cidade',
+      state: 'Estado',
+    });
 
-    const users = Array.from({ length }).map(() => {
+    const usersData = Array.from({ length }).map(() => {
       const firstName = faker.person.firstName();
       const lastName = faker.person.lastName();
       const emailLastName = lastName.slice(0, 3).toLowerCase();
@@ -56,16 +49,11 @@ export class Seed {
       };
     });
 
-    for (const user of users) {
-      await seed.user([
-        {
-          name: user.name,
-          email: user.email,
-          password: user.password,
-          birthDate: user.birthDate,
-        },
-      ]);
-    }
+    const users = await this.userDatasource.insertMany(usersData);
+    const ids: number[] = [];
+    users.forEach(user => {
+      ids.push(user.id)
+    })
     const addresses = Array.from({ length }).map((_: unknown, index: number) => {
       return {
         id: index + 2,
@@ -80,20 +68,6 @@ export class Seed {
       };
     });
 
-    for (const address of addresses) {
-      await seed.address([
-        {
-          id: address.id,
-          userId: address.userId,
-          cep: address.cep,
-          street: address.street,
-          streetNumber: address.streetNumber,
-          complement: address.complement,
-          neighborhood: address.neighborhood,
-          city: address.city,
-          state: address.state,
-        },
-      ]);
-    }
+    await this.addressDatasource.insertMany(addresses, ids);
   }
 }

@@ -1,7 +1,8 @@
-import { resetDatabase, getSeedClient } from '@data/db/seed';
+import 'reflect-metadata';
 import { UserDbDataSource } from '@data/user';
 import { createUser, requestMaker, checkUser, checkError } from '@test';
 import { connectServer, connectDb, getToken, disconnectServer, disconnectDb } from '@test/utils';
+import { UserInputModel, UserModel } from '@domain/model';
 
 describe('UserResolver - CreateUser', () => {
   const mutation = `
@@ -12,21 +13,21 @@ describe('UserResolver - CreateUser', () => {
       email,
       birthDate
       }
-      }
-      `;
+    }
+  `;
   const datasource = new UserDbDataSource();
   let token: string | undefined;
 
-  before('before', async () => {
+  beforeAll(async () => {
     await connectServer();
     await connectDb();
     const user = await createUser();
     token = await getToken(user);
   });
 
-  after('after', async () => {
+  afterAll(async () => {
     await disconnectServer();
-    await resetDatabase(await getSeedClient());
+    await datasource.deleteAll();
     await disconnectDb();
   });
 
@@ -40,9 +41,9 @@ describe('UserResolver - CreateUser', () => {
         birthDate: '09-04-2004',
       },
     };
-    const response = await requestMaker<any, any>({ query: mutation, variables, token });
+    const response = await requestMaker<{ createUser: UserModel }, { data: UserInputModel }>({ query: mutation, variables, token });
     const user = await datasource.findOneByEmail('sam@example.com');
-    checkUser(response.data.data.createUser, user);
+    checkUser(response.data.data?.createUser, user);
   });
 
   it('should return an error for missing token', async () => {
@@ -55,13 +56,13 @@ describe('UserResolver - CreateUser', () => {
       },
     };
 
-    const response = await requestMaker<any, any>({ query: mutation, variables });
-    const error = response.data.errors[0];
-    checkError(response, error.code, error.message, error.additionalInfo);
+    const response = await requestMaker<any, { data: UserInputModel }>({ query: mutation, variables });
+    const error = response.data.errors?.at(0);
+    checkError(response, error?.code, error?.message, error?.additionalInfo);
   });
 
   it('should return an error for invalid token', async () => {
-    token = 'none';
+    token = '';
     const variables = {
       data: {
         name: 'Jeff',
@@ -71,9 +72,9 @@ describe('UserResolver - CreateUser', () => {
       },
     };
 
-    const response = await requestMaker<any, any>({ query: mutation, variables, token });
-    const error = response.data.errors[0];
-    checkError(response, error.code, error.message, error.additionalInfo);
+    const response = await requestMaker<any, { data: UserInputModel }>({ query: mutation, variables, token });
+    const error = response.data.errors?.at(0);
+    checkError(response, error?.code, error?.message, error?.additionalInfo);
   });
 
   it('should return an error for existing email', async () => {
@@ -86,9 +87,9 @@ describe('UserResolver - CreateUser', () => {
       },
     };
 
-    const response = await requestMaker<any, any>({ query: mutation, variables, token });
-    const error = response.data.errors[0];
-    checkError(response, error.code, error.message, error.additionalInfo);
+    const response = await requestMaker<any, { data: UserInputModel }>({ query: mutation, variables, token });
+    const error = response.data.errors?.at(0);
+    checkError(response, error?.code, error?.message, error?.additionalInfo);
   });
 
   it('should return an error for invalid password', async () => {
@@ -101,9 +102,9 @@ describe('UserResolver - CreateUser', () => {
       },
     };
 
-    const response = await requestMaker<any, any>({ query: mutation, variables, token });
-    const error = response.data.errors[0];
-    checkError(response, error.code, error.message, error.additionalInfo);
+    const response = await requestMaker<any, { data: UserInputModel }>({ query: mutation, variables, token });
+    const error = response.data.errors?.at(0);
+    checkError(response, error?.code, error?.message, error?.additionalInfo);
   });
 
   it('should return an error for invalid input', async () => {
@@ -116,8 +117,8 @@ describe('UserResolver - CreateUser', () => {
       },
     };
 
-    const response = await requestMaker<any, any>({ query: mutation, variables, token });
-    const error = response.data.errors[0];
-    checkError(response, error.code, error.message, error.additionalInfo);
+    const response = await requestMaker<any, { data: UserInputModel }>({ query: mutation, variables, token });
+    const error = response.data.errors?.at(0);
+    checkError(response, error?.code, error?.message, error?.additionalInfo);
   });
 });

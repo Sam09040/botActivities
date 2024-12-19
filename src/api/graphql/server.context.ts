@@ -9,7 +9,7 @@ export interface ServerContext {
 export const context = async ({ req }: any): Promise<ServerContext> => {
   const token = req.headers.authorization ?? undefined;
   if (!token) {
-    return undefined;
+    return token;
   }
   const { userId } = Container.get(JwtService).decode<ServerContext>(token).data;
   return { userId, token };

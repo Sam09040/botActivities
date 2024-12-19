@@ -1,11 +1,13 @@
-import { resetDatabase, getSeedClient } from '@data/db/seed';
+import 'reflect-metadata';
+import { UserDbDataSource } from '@data/user';
 import { UserModel } from '@domain/model';
 import { createAddress, createUser, requestMaker, checkAddress, checkError, checkUser } from '@test';
 import { connectServer, connectDb, disconnectDb, disconnectServer, getToken } from '@test/utils';
+import Container from 'typedi';
+import { User } from './user.type';
 
 describe('UserResolver - User', () => {
-  const port = process.env.PORT;
-  const url = `http://localhost:${port}/`;
+  const datasource = Container.get(UserDbDataSource);
   const query = `
     query user($userId: Int!){
       user(id: $userId) {
@@ -15,23 +17,22 @@ describe('UserResolver - User', () => {
       }
     }
   `;
-
   let token: string | undefined;
   let user: UserModel;
-  before('Begin services', async () => {
+  beforeAll(async () => {
     await connectServer();
     await connectDb();
   });
-  after('End services', async () => {
+  afterAll(async () => {
     await disconnectServer();
-    await resetDatabase(await getSeedClient());
+    await datasource.deleteAll();
     await disconnectDb();
   });
-  beforeEach('before each', async () => {
+  beforeEach(async () => {
     user = await createUser();
   });
-  afterEach('after each', async () => {
-    await resetDatabase(await getSeedClient());
+  afterEach(async () => {
+    await datasource.deleteAll();
   });
 
   it('should return an error for no token', async () => {
@@ -40,8 +41,8 @@ describe('UserResolver - User', () => {
     };
 
     const response = await requestMaker({ query, variables });
-    const error = response.data.errors[0];
-    checkError(response, error.code, error.message, error.additionalInfo);
+    const error = response.data.errors?.at(0);
+    checkError(response, error?.code, error?.message, error?.additionalInfo);
   });
 
   it('should return an error for invalid token', async () => {
@@ -49,11 +50,11 @@ describe('UserResolver - User', () => {
       userId: 1,
     };
 
-    token = 'none';
+    token = '';
 
     const response = await requestMaker<any, any>({ query, variables, token });
-    const error = response.data.errors[0];
-    checkError(response, error.code, error.message, error.additionalInfo);
+    const error = response.data.errors?.at(0);
+    checkError(response, error?.code, error?.message, error?.additionalInfo);
   });
 
   it('should return user', async () => {
@@ -96,8 +97,8 @@ describe('UserResolver - User', () => {
       userId: user.id,
     };
 
-    const response = await requestMaker<any, any>({ query, variables, token });
-    checkUser(response.data.data.user, user);
-    checkAddress(response.data.data.user.addresses[0], address);
+    const response = await requestMaker<{ user: User }, { userId: number }>({ query, variables, token });
+    checkUser(response.data.data?.user, user);
+    checkAddress(response.data.data?.user.addresses[0], address);
   });
 });

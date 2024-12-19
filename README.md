@@ -7,8 +7,7 @@
 - Language: TypeScript
 - ORM: Prisma
 - Data consulting: GraphQL, Apollo and PopSQL
-- Seeding: Snaplet
-- Testing: Mocha
+- Testing: Jest
 
 ## Steps to run and debug:
 ### Get dependencies
@@ -21,12 +20,11 @@ docker-compose up -d
 ```
 ### Add the .env file with the url to the database
 
-### Configure the snaplet client
+### Run the prisma generate command to update the client
 ```bash
-npx @snaplet/seed init
-npx @snaplet/seed sync
+npx prisma generate dev
 ```
-### Run the code with the command below or use the platform of your choice to see the data
+### Run the code with the command below and use the platform of your choice to see the data
 ```bash
 npm run start
 ```

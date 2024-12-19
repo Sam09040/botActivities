@@ -27,7 +27,13 @@ export class JwtService {
     }
   }
 
-  public verify<T>(token: string): JwtToken<T> {
+  public verify<T>(token: string | undefined): JwtToken<T> {
+    if(!token) {
+      throw new UnauthorizedError('Non existent token', {
+        field: 'authorization',
+        reason: 'A valid token must be provided.'
+      });
+    }
     try {
       return verify(token, this.secret) as JwtToken<T>;
     } catch (error) {
