@@ -24,7 +24,7 @@
   ],
   "prisma": {
     "schema": "src/data/db/schema.prisma",
-    "seed": "src/data/db/seed.ts"
+    "seed": "npm run seeds"
   },
   "author": "Sam",
   "license": "ISC",

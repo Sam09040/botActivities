@@ -1,5 +1,5 @@
 import { UserInputModel } from '@domain/model';
-import { IsEmail, IsNotEmpty, Length, MaxLength, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, Length, Matches, MaxLength, MinLength } from 'class-validator';
 import { Field, InputType } from 'type-graphql';
 
 @InputType({ description: 'Infos to create an user' })
@@ -21,7 +21,8 @@ export class UserInput implements UserInputModel {
   password: string;
 
   @Field(() => String, { description: 'Birth date' })
-  @IsNotEmpty({ message: 'The birth date must not be empty and must have the format dd-MM-yyyy' })
-  @Length(10, 10, { message: 'The birth date must have 10 characters and must have the format dd-MM-yyyy' })
+  @IsNotEmpty({ message: 'The birth date must not be empty' })
+  @Length(10, 10, { message: 'The birth date must have 10 characters' })
+  @Matches(/[0-9]{2}-[0-9]{2}-[0-9]{4}/, { message: 'Birth date must be in the format dd-MM-yyyy' })
   birthDate: string;
 }

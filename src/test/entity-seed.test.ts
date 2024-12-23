@@ -56,7 +56,7 @@ export async function createUsers(length: number = 50): Promise<User[]> {
 
 export async function createAddresses(userIds: number[]) {
   const length = userIds.length;
-  const addresses = Array.from({ length }).map((_: unknown) => {
+  const addresses = Array.from({ length }).map(() => {
     return {
       userId: faker.number.int({ min: 2, max: length }),
       cep: faker.location.zipCode('#####-###'),

@@ -12,8 +12,14 @@ import { FileUpload } from 'graphql-upload-ts';
 import path from 'path';
 import { Service } from 'typedi';
 
+interface ErrorConstraints {
+  user: string;
+  property: string;
+  constraints: { [type: string]: string; } | undefined;
+}
+
 @Service()
-export class CreateManyUseCase {
+export class CreateManyUsersUseCase {
   constructor(
     private readonly csvService: CsvService,
     private readonly userDbDatasource: UserDbDataSource,
@@ -76,8 +82,8 @@ export class CreateManyUseCase {
     this.sendEmails(csvData, originalPasswords);
   }
 
-  async validateCsvData(csvData: CsvInputModel[]): Promise<unknown[]> {
-    const errorConstraints: unknown[] = [];
+  async validateCsvData(csvData: CsvInputModel[]): Promise<ErrorConstraints[]> {
+    const errorConstraints: ErrorConstraints[] = [];
     const csvInput = new CsvInputValidation();
     for (const [i, user] of csvData.entries()) {
       csvInput.updateData(user);

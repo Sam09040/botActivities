@@ -2,7 +2,7 @@ import 'reflect-metadata';
 import fs from 'node:fs';
 import FormData from 'form-data';
 import Container from 'typedi';
-import { checkError, createUser, requestMaker } from '@test';
+import { checkError, checkUser, createUser, requestMaker } from '@test';
 import { connectDb, connectServer, disconnectDb, disconnectServer } from '@test/utils';
 import { expect } from 'chai';
 import { UserDbDataSource } from '@data/user';
@@ -34,10 +34,16 @@ describe('UserResolver - CreateManyUsers', () => {
     formData.append('0', file);
     const response = await requestMaker<{ uploadCsv: string }, undefined>({ formData });
     const user = await datasource.findAll();
+    const test = {
+      name: 'nix',
+      email: 'nix@example.com',
+      birthDate: '09-04-2003',
+    };
     expect(response.data.data?.uploadCsv).to.equal(
       'Upload ended successfully! Check the database to see the uploaded info.',
     );
     isDefined(user);
+    checkUser(test, user[0]);
   });
 
   it('should create multiple users', async () => {
@@ -46,12 +52,32 @@ describe('UserResolver - CreateManyUsers', () => {
     formData.append('map', JSON.stringify({ 0: ['variables.file'] }));
     formData.append('0', file);
     const response = await requestMaker<{ uploadCsv: string }, undefined>({ formData });
-    const user = await datasource.findAll();
+    const users = await datasource.findAll();
+    const test = [
+      {
+        name: 'Chloe Schmitz',
+        email: 'chloesch@example.com',
+        birthDate: '21-10-2002',
+      },
+      {
+        name: 'Ryan Peyton',
+        email: 'ryanpey@example.com',
+        birthDate: '05-02-1998',
+      },
+      {
+        name: 'Trish Connors',
+        email: 'trishcon@example.com',
+        birthDate: '23-12-2006',
+      },
+    ];
     expect(response.data.data?.uploadCsv).to.equal(
       'Upload ended successfully! Check the database to see the uploaded info.',
     );
-    isDefined(user);
-    expect(user.length).to.equal(3);
+    isDefined(users);
+    expect(users.length).to.equal(3);
+    Array.from(users).map((user, i) => {
+      checkUser(test[i], user);
+    })
   });
 
   it('should return an error for invalid fields', async () => {

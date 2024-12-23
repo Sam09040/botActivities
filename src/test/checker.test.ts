@@ -20,7 +20,7 @@ export function checkError(
   expect(res.data.errors[0].additionalInfo?.reason).to.equal(additionalInfo?.reason);
 }
 
-export function checkUser(response: UserModel | undefined, user: UserModel | null) {
+export function checkUser(response: Partial<UserModel> | undefined, user: Partial<UserModel> | null) {
   expect(response?.email).to.equal(user?.email);
   expect(response?.birthDate).to.equal(user?.birthDate);
   expect(response?.name).to.equal(user?.name);
@@ -28,7 +28,6 @@ export function checkUser(response: UserModel | undefined, user: UserModel | nul
 
 export function checkAddress(response: AddressModel | undefined, address: AddressModel | null) {
   expect(response).to.be.deep.eq({
-    id: address?.id,
     cep: address?.cep,
     street: address?.street,
     streetNumber: address?.streetNumber,

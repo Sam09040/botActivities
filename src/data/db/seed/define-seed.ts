@@ -51,9 +51,9 @@ export class Seed {
 
     const users = await this.userDatasource.insertMany(usersData);
     const ids: number[] = [];
-    users.forEach(user => {
-      ids.push(user.id)
-    })
+    users.forEach((user) => {
+      ids.push(user.id);
+    });
     const addresses = Array.from({ length }).map((_: unknown, index: number) => {
       return {
         id: index + 2,
