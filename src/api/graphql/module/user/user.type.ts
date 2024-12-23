@@ -24,7 +24,7 @@ export class User implements UserModel {
 @ObjectType()
 export class Users implements PageInfo {
   @Field(() => [User], { description: 'User info' })
-  users: User[];
+  users: Partial<User>[];
 
   @Field(() => Int, { description: 'Page number' })
   page: number;

@@ -8,6 +8,12 @@ export interface UserModel {
   addresses: Array<AddressModel>;
 }
 
+export interface UsersModel {
+  users: Array<Partial<UserModel>>;
+  page: number;
+  maxPage: number;
+}
+
 export interface CsvInputModel {
   name: string;
   email: string;

@@ -32,7 +32,7 @@ export class UserResolver {
 
   @Query(() => Users, { description: 'Get users' })
   @Authorized()
-  users(@Arg('pageInput') pageInput: PageInput) {
+  users(@Arg('pageInput') pageInput: PageInput): Promise<Users> {
     return this.usersUseCase.exec(pageInput);
   }
 

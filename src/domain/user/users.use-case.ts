@@ -1,12 +1,13 @@
 import { buildPageInfo, PageInputModel } from '@core/pagination';
 import { UserDbDataSource } from '@data/user';
+import { UsersModel } from '@domain/model';
 import { Service } from 'typedi';
 
 @Service()
 export class UsersUseCase {
   constructor(private readonly datasource: UserDbDataSource) {}
 
-  async exec(input: PageInputModel) {
+  async exec(input: PageInputModel): Promise<UsersModel> {
     let { skip, limit } = input;
 
     const totalUsers = await this.datasource.count();
