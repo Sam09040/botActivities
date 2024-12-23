@@ -15,7 +15,7 @@ import { Service } from 'typedi';
 interface ErrorConstraints {
   user: string;
   property: string;
-  constraints: { [type: string]: string; } | undefined;
+  constraints: { [type: string]: string } | undefined;
 }
 
 @Service()
@@ -29,7 +29,7 @@ export class CreateManyUsersUseCase {
     private readonly cryptoService: CryptoService,
   ) {}
 
-  async exec(file: FileUpload) {
+  async exec(file: FileUpload): Promise<void> {
     const { filename } = file;
 
     const extension = path.extname(filename);
@@ -51,7 +51,7 @@ export class CreateManyUsersUseCase {
     }
 
     const emails = csvData.map((user: CsvInputModel) => user.email);
-    const userAlreadyExists = await this.userDbDatasource.findManyByEmail(emails);
+    const userAlreadyExists = await this.userDbDatasource.findManyByEmails(emails);
 
     if (userAlreadyExists.length > 0) {
       throw new InvalidDataError('One or more users already exist', {
@@ -76,8 +76,8 @@ export class CreateManyUsersUseCase {
     }
 
     const newUsers = await this.userDbDatasource.insertMany(csvUsers);
-    const usersIds = newUsers.map((user) => user.id);
-    await this.addressDbDatasource.insertMany(csvAddresses, usersIds);
+    const userId = newUsers.map((user) => user.id);
+    await this.addressDbDatasource.insertMany({ addressInput: csvAddresses, userId });
 
     this.sendEmails(csvData, originalPasswords);
   }
@@ -132,7 +132,7 @@ export class CreateManyUsersUseCase {
     return { csvUsers, csvAddresses, originalPasswords };
   }
 
-  async sendEmails(csvData: CsvInputModel[], passwords: string[]) {
+  async sendEmails(csvData: CsvInputModel[], passwords: string[]): Promise<void> {
     for (const [i, user] of csvData.entries()) {
       //await this.emailService.sendEmail(user.name, user.email, passwords[i]);
       console.log(`Email sent to ${user.name} with the new password: ${passwords[i]}`);

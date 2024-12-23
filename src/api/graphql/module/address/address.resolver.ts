@@ -15,13 +15,13 @@ export class AddressResolver {
 
   @Query(() => [Address], { description: 'Get addresses' })
   @Authorized()
-  async address(@Ctx() { userId }: ServerContext) {
+  async address(@Ctx() { userId }: ServerContext): Promise<Address[]> {
     return this.addressUseCase.exec(userId);
   }
 
   @Mutation(() => Address, { description: 'Create a new address' })
   @Authorized()
-  async createAddress(@Arg('data', () => AddressInput) data: AddressInput, @Ctx() { userId }: ServerContext) {
+  async createAddress(@Arg('data') data: AddressInput, @Ctx() { userId }: ServerContext): Promise<Address> {
     data.userId = userId;
     return this.createAddressUseCase.exec(data);
   }

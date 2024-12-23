@@ -27,6 +27,6 @@ export class AddressUseCase {
       });
     }
 
-    return await this.addressDatasource.findAddresses(user.id);
+    return this.addressDatasource.findAddresses(user.id);
   }
 }

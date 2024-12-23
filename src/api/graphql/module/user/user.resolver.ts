@@ -20,30 +20,30 @@ export class UserResolver {
   ) {}
 
   @Query(() => String, { description: 'Hello test' })
-  hello() {
+  hello(): string {
     return 'hello';
   }
 
   @Query(() => User, { description: 'Get user by id' })
   @Authorized()
-  user(@Arg('id', () => Int) id: number) {
+  user(@Arg('id', () => Int) id: number): Promise<User> {
     return this.userUseCase.exec(id);
   }
 
   @Query(() => Users, { description: 'Get users' })
   @Authorized()
-  users(@Arg('pageInput', () => PageInput) pageInput: PageInput) {
+  users(@Arg('pageInput') pageInput: PageInput) {
     return this.usersUseCase.exec(pageInput);
   }
 
   @Mutation(() => User, { description: 'Create new user' })
   @Authorized()
-  createUser(@Arg('data', () => UserInput) data: UserInput) {
+  createUser(@Arg('data') data: UserInput): Promise<User> {
     return this.createUserUseCase.exec(data);
   }
 
   @Mutation(() => Login, { description: 'Authenticate user' })
-  login(@Arg('data', () => LoginInput) data: LoginInput) {
+  login(@Arg('data') data: LoginInput): Promise<Login> {
     return this.loginUseCase.exec(data);
   }
 

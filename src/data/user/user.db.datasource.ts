@@ -9,7 +9,7 @@ export class UserDbDataSource {
     return dbClient.user.create({ data: input, include: { addresses: true } });
   }
 
-  insertMany(data: UserInputModel[]) {
+  insertMany(data: UserInputModel[]): Promise<User[]> {
     return dbClient.user.createManyAndReturn({ data });
   }
 
@@ -24,7 +24,7 @@ export class UserDbDataSource {
     });
   }
 
-  findManyByEmail(emails: string[]) {
+  findManyByEmails(emails: string[]): Promise<User[]> {
     return dbClient.user.findMany({
       where: {
         email: {

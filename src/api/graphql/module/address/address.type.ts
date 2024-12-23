@@ -19,7 +19,7 @@ export class Address implements AddressModel {
   streetNumber: string;
 
   @Field(() => String, { description: 'Address complement', nullable: true })
-  complement?: string;
+  complement?: string | null | undefined;
 
   @Field(() => String, { description: 'Address neighborhood' })
   neighborhood: string;

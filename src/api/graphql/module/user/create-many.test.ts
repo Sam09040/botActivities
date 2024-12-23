@@ -13,47 +13,19 @@ describe('UserResolver - CreateManyUsers', () => {
   const query = { query: 'mutation UploadCsv($file: Upload!) {uploadCsv(file: $file)}' };
   const formData = new FormData();
   const datasource = Container.get(UserDbDataSource);
-  beforeAll(async () => {
-    await connectDb();
-    await connectServer();
-  });
-
-  afterEach(async () => {
-    await datasource.deleteAll();
-  });
-
-  afterAll(async () => {
-    await disconnectServer();
-    await disconnectDb();
-  });
-
-  it('should create a single user', async () => {
-    const file = fs.createReadStream('./src/test/csv/single-user.csv', 'utf-8');
-    formData.append('operations', JSON.stringify(query));
-    formData.append('map', JSON.stringify({ 0: ['variables.file'] }));
-    formData.append('0', file);
-    const response = await requestMaker<{ uploadCsv: string }, undefined>({ formData });
-    const user = await datasource.findAll();
-    const test = {
+  const files = {
+    singleUser: fs.createReadStream('./src/test/csv/single-user.csv', 'utf-8'),
+    multipleUsers: fs.createReadStream('./src/test/csv/multiple-users.csv', 'utf-8'),
+    noUser: fs.createReadStream('./src/test/csv/empty.csv', 'utf-8'),
+    wrongData: fs.createReadStream('./src/test/csv/missing-input.csv', 'utf-8'),
+  };
+  const tests = {
+    singleUserTest: {
       name: 'nix',
       email: 'nix@example.com',
       birthDate: '09-04-2003',
-    };
-    expect(response.data.data?.uploadCsv).to.equal(
-      'Upload ended successfully! Check the database to see the uploaded info.',
-    );
-    isDefined(user);
-    checkUser(test, user[0]);
-  });
-
-  it('should create multiple users', async () => {
-    const file = fs.createReadStream('./src/test/csv/multiple-users.csv', 'utf-8');
-    formData.append('operations', JSON.stringify(query));
-    formData.append('map', JSON.stringify({ 0: ['variables.file'] }));
-    formData.append('0', file);
-    const response = await requestMaker<{ uploadCsv: string }, undefined>({ formData });
-    const users = await datasource.findAll();
-    const test = [
+    },
+    multipleUsersTest: [
       {
         name: 'Chloe Schmitz',
         email: 'chloesch@example.com',
@@ -69,22 +41,56 @@ describe('UserResolver - CreateManyUsers', () => {
         email: 'trishcon@example.com',
         birthDate: '23-12-2006',
       },
-    ];
+    ],
+  };
+
+  beforeAll(async () => {
+    await connectDb();
+    await connectServer();
+  });
+
+  afterEach(async () => {
+    await datasource.deleteAll();
+  });
+
+  afterAll(async () => {
+    await disconnectServer();
+    await disconnectDb();
+  });
+
+  it('should create a single user', async () => {
+    formData.append('operations', JSON.stringify(query));
+    formData.append('map', JSON.stringify({ 0: ['variables.file'] }));
+    formData.append('0', files.singleUser);
+    const response = await requestMaker<{ uploadCsv: string }, undefined>({ formData });
+    const user = await datasource.findAll();
+    expect(response.data.data?.uploadCsv).to.equal(
+      'Upload ended successfully! Check the database to see the uploaded info.',
+    );
+    isDefined(user);
+    checkUser(tests.singleUserTest, user[0]);
+  });
+
+  it('should create multiple users', async () => {
+    formData.append('operations', JSON.stringify(query));
+    formData.append('map', JSON.stringify({ 0: ['variables.file'] }));
+    formData.append('0', files.multipleUsers);
+    const response = await requestMaker<{ uploadCsv: string }, undefined>({ formData });
+    const users = await datasource.findAll();
     expect(response.data.data?.uploadCsv).to.equal(
       'Upload ended successfully! Check the database to see the uploaded info.',
     );
     isDefined(users);
     expect(users.length).to.equal(3);
     Array.from(users).map((user, i) => {
-      checkUser(test[i], user);
-    })
+      checkUser(tests.multipleUsersTest[i], user);
+    });
   });
 
   it('should return an error for invalid fields', async () => {
-    const file = fs.createReadStream('./src/test/csv/missing-input.csv', 'utf-8');
     formData.append('operations', JSON.stringify(query));
     formData.append('map', JSON.stringify({ 0: ['variables.file'] }));
-    formData.append('0', file);
+    formData.append('0', files.wrongData);
     const response = await requestMaker({ formData });
     checkError(response, 400, 'Invalid or missing fields on the file!', {
       field: 'file',
@@ -93,10 +99,9 @@ describe('UserResolver - CreateManyUsers', () => {
   });
 
   it('should return an error for empty fields', async () => {
-    const file = fs.createReadStream('./src/test/csv/empty.csv', 'utf-8');
     formData.append('operations', JSON.stringify(query));
     formData.append('map', JSON.stringify({ 0: ['variables.file'] }));
-    formData.append('0', file);
+    formData.append('0', files.noUser);
     const response = await requestMaker({ formData });
     checkError(response, 400, 'The file must contain at least one user info', {
       field: 'file',
@@ -112,10 +117,9 @@ describe('UserResolver - CreateManyUsers', () => {
       password: 'Nix123',
     };
     await createUser(user);
-    const file = fs.createReadStream('./src/test/csv/single-user.csv', 'utf-8');
     formData.append('operations', JSON.stringify(query));
     formData.append('map', JSON.stringify({ 0: ['variables.file'] }));
-    formData.append('0', file);
+    formData.append('0', files.singleUser);
     const response = await requestMaker({ formData });
     checkError(response, 400, 'One or more users already exist', {
       field: 'data',

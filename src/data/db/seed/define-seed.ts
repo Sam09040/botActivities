@@ -68,6 +68,6 @@ export class Seed {
       };
     });
 
-    await this.addressDatasource.insertMany(addresses, ids);
+    await this.addressDatasource.insertMany({ addressInput: addresses, userId: ids });
   }
 }

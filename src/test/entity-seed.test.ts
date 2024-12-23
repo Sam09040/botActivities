@@ -40,16 +40,16 @@ export async function createAddress(userId: number = 1): Promise<AddressModel> {
 export async function createUsers(length: number = 50): Promise<User[]> {
   const users = Array.from({ length }).map(() => {
     const firstName = faker.person.firstName();
-      const lastName = faker.person.lastName();
-      const emailLastName = lastName.slice(0, 3).toLowerCase();
-      const birthDate = format(faker.date.birthdate({ min: 18, max: 80, mode: 'age' }), 'dd-MM-yyyy');
+    const lastName = faker.person.lastName();
+    const emailLastName = lastName.slice(0, 3).toLowerCase();
+    const birthDate = format(faker.date.birthdate({ min: 18, max: 80, mode: 'age' }), 'dd-MM-yyyy');
 
-      return {
-        name: `${firstName} ${lastName}`,
-        email: `${firstName.toLowerCase()}${emailLastName}@example.com`,
-        password: faker.internet.password(),
-        birthDate,
-      };
+    return {
+      name: `${firstName} ${lastName}`,
+      email: `${firstName.toLowerCase()}${emailLastName}@example.com`,
+      password: faker.internet.password(),
+      birthDate,
+    };
   });
   return await Container.get(UserDbDataSource).insertMany(users);
 }
@@ -68,5 +68,5 @@ export async function createAddresses(userIds: number[]) {
       state: faker.location.state(),
     };
   });
-  await Container.get(AddressDbDataSource).insertMany(addresses, userIds);
+  await Container.get(AddressDbDataSource).insertMany({ addressInput: addresses, userId: userIds });
 }

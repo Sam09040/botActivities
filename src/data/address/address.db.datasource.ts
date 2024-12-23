@@ -12,12 +12,12 @@ export class AddressDbDataSource {
     return dbClient.address.findMany({ where: { userId } });
   }
 
-  async insertMany(addressInput: AddressInputModel[], userId: number[]): Promise<AddressModel[]> {
+  async insertMany({ addressInput, userId }: { addressInput: AddressInputModel[]; userId: number[] }): Promise<AddressModel[]> {
     const data = addressInput.map((address: AddressInputModel, index: number) => ({
       ...address,
       userId: userId?.[index],
     }));
 
-    return await dbClient.address.createManyAndReturn({ data });
+    return dbClient.address.createManyAndReturn({ data });
   }
 }
