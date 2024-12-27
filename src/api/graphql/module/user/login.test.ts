@@ -1,24 +1,21 @@
-import { connectServer, connectDb } from '@test/utils/connect.util';
-import { disconnectServer, disconnectDb } from '@test/utils/disconnect.util';
-import { requestMaker } from '@test/request-maker';
-import { checkError, checkLogin } from '@test/checker.test';
-import { createUser } from '@test/entity-seed.test';
+import 'reflect-metadata';
 import { UserDbDataSource } from '@data/user';
-import { resetDatabase } from '@data/db/seed/reset-database';
-import { getSeedClient } from '@data/db/seed/seed-client';
+import { requestMaker, checkError, checkLogin, createUser } from '@test';
+import { connectServer, connectDb, disconnectServer, disconnectDb } from '@test/utils';
 import Container from 'typedi';
+import { LoginInputModel, LoginModel } from '@domain/model';
 
 describe('UserResolver - Login', () => {
   const datasource = Container.get(UserDbDataSource);
-  before('Begin services', async () => {
+  beforeAll(async () => {
     await connectServer();
     await connectDb();
     await createUser();
   });
 
-  after('End services', async () => {
+  afterAll(async () => {
     await disconnectServer();
-    await resetDatabase(await getSeedClient());
+    datasource.deleteAll();
     await disconnectDb();
   });
 
@@ -46,8 +43,8 @@ describe('UserResolver - Login', () => {
     };
 
     const response = await requestMaker({ query: mutation, variables });
-    const error = response.data.errors[0];
-    checkError(response, error.code, error.message, error.additionalInfo);
+    const error = response.data.errors?.at(0);
+    checkError(response, error?.code, error?.message, error?.additionalInfo);
   });
 
   it('should return an error for wrong password', async () => {
@@ -60,8 +57,8 @@ describe('UserResolver - Login', () => {
     };
 
     const response = await requestMaker({ query: mutation, variables });
-    const error = response.data.errors[0];
-    checkError(response, error.code, error.message, error.additionalInfo);
+    const error = response.data.errors?.at(0);
+    checkError(response, error?.code, error?.message, error?.additionalInfo);
   });
 
   it('should return success and show the user and a token', async () => {
@@ -73,8 +70,8 @@ describe('UserResolver - Login', () => {
       },
     };
 
-    const response = await requestMaker<any, any>({ query: mutation, variables }, { token: 'none' });
+    const response = await requestMaker<{ login: LoginModel }, {data: LoginInputModel}>({ query: mutation, variables });
     const user = await datasource.findOneByEmail('sam@example.com');
-    checkLogin(response.data.data.login, user);
+    checkLogin(response.data.data?.login, user);
   });
 });

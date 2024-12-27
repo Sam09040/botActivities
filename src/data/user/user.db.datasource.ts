@@ -9,6 +9,10 @@ export class UserDbDataSource {
     return dbClient.user.create({ data: input, include: { addresses: true } });
   }
 
+  insertMany(data: UserInputModel[]): Promise<User[]> {
+    return dbClient.user.createManyAndReturn({ data });
+  }
+
   count() {
     return dbClient.user.count();
   }
@@ -17,6 +21,16 @@ export class UserDbDataSource {
     return dbClient.user.findUnique({
       where: { email },
       include: { addresses: true },
+    });
+  }
+
+  findManyByEmails(emails: string[]): Promise<User[]> {
+    return dbClient.user.findMany({
+      where: {
+        email: {
+          in: emails,
+        },
+      },
     });
   }
 

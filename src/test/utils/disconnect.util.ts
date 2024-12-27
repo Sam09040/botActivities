@@ -3,6 +3,7 @@ import { stop } from '@graphql/graphql-server';
 
 export const disconnectServer = async () => {
   await stop();
+  console.log('Server stopped');
 };
 
 export const disconnectDb = async () => {

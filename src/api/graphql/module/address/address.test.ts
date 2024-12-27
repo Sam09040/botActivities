@@ -1,20 +1,17 @@
+import 'reflect-metadata';
 import { AddressDbDataSource } from '@data/address';
-import { resetDatabase } from '@data/db/seed/reset-database';
-import { getSeedClient } from '@data/db/seed/seed-client';
 import { UserDbDataSource } from '@data/user';
-import { checkAddress } from '@test/checker.test';
-import { createUser } from '@test/entity-seed.test';
-import { requestMaker } from '@test/request-maker';
-import { connectServer, connectDb } from '@test/utils/connect.util';
-import { disconnectServer, disconnectDb } from '@test/utils/disconnect.util';
+import { createUser, requestMaker, checkAddress } from '@test';
+import { connectServer, connectDb, disconnectServer, disconnectDb, getToken } from '@test/utils';
 import Container from 'typedi';
+import { AddressModel } from '@domain/model';
 
 describe('AddressResolver - Address', () => {
   const addressDatasource = Container.get(AddressDbDataSource);
   const userDatasource = Container.get(UserDbDataSource);
   const query = `
-      query address($userId: Int!){
-        address(userId: $userId) {
+      query address {
+        address {
           id
           cep
           street
@@ -28,26 +25,27 @@ describe('AddressResolver - Address', () => {
     `;
 
   let userId: number;
-
-  before('before', async () => {
+  let token: string | undefined;
+  beforeAll(async () => {
     await connectServer();
     await connectDb();
   });
 
-  after('after', async () => {
-    await resetDatabase(await getSeedClient());
+  afterAll(async () => {
+    await userDatasource.deleteAll();
     await disconnectServer();
     await disconnectDb();
   });
 
-  beforeEach('beforeEach', async () => {
+  beforeEach(async () => {
     const user = await createUser();
     if (user) {
       userId = user.id;
     }
+    token = await getToken(user);
   });
 
-  afterEach('after each', async () => {
+  afterEach(async () => {
     await userDatasource.deleteAll();
   });
 
@@ -74,10 +72,13 @@ describe('AddressResolver - Address', () => {
       state: 'State',
     };
 
-    await addressDatasource.insert(data.data);
-    const address = await addressDatasource.insert(variables.data);
+    await addressDatasource.insert(data);
+    const address = await addressDatasource.insert(variables);
 
-    const response = await requestMaker<any, { userId: number }>({ query, variables: { userId } });
-    checkAddress(response.data.data.address[1], address);
+    const response = await requestMaker<{ address: AddressModel }, undefined>({
+      query,
+      token,
+    });
+    await checkAddress(response.data.data?.address[1], address);
   });
 });

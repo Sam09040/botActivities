@@ -11,4 +11,13 @@ export class AddressDbDataSource {
   findAddresses(userId?: number) {
     return dbClient.address.findMany({ where: { userId } });
   }
+
+  async insertMany({ addressInput, userId }: { addressInput: AddressInputModel[]; userId: number[] }): Promise<AddressModel[]> {
+    const data = addressInput.map((address: AddressInputModel, index: number) => ({
+      ...address,
+      userId: userId?.[index],
+    }));
+
+    return dbClient.address.createManyAndReturn({ data });
+  }
 }

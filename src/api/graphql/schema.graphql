@@ -9,7 +9,10 @@ type Mutation {
     createUser(data: UserInput!): User!
     createAddress(data: AddressInput!): Address!
     login(data: LoginInput!): AuthPayload!
+    uploadCsv(file: Upload!): String!
 }
+
+scalar Upload
 
 type User {
     id: ID!
@@ -37,8 +40,8 @@ type AuthPayload {
 
 type UsersPayload {
     users: [User]!
-    page: Int
-    maxPage: Int
+    page: Int!
+    maxPage: Int!
 }
 
 input PageInput {

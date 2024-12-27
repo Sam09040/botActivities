@@ -8,7 +8,7 @@ export enum StatusCode {
 }
 
 export enum ErrorType {
-  DataSourceError = StatusCode.ServerError,
+  DatasourceError = StatusCode.ServerError,
   ForbiddenError = StatusCode.Forbidden,
   InvalidDataError = StatusCode.BadRequest,
   NotFoundError = StatusCode.NotFound,

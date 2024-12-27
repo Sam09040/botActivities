@@ -4,7 +4,7 @@ export interface AddressModel {
   cep: string;
   street: string;
   streetNumber: string;
-  complement?: string | null;
+  complement?: string | null | undefined;
   neighborhood: string;
   city: string;
   state: string;
@@ -15,7 +15,7 @@ export interface AddressInputModel {
   cep: string;
   street: string;
   streetNumber: string;
-  complement?: string | null;
+  complement?: string | null | undefined;
   neighborhood: string;
   city: string;
   state: string;

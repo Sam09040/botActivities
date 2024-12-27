@@ -11,13 +11,8 @@ export class CreateAddressUseCase {
     private readonly addressDatasource: AddressDbDataSource,
   ) {}
   async exec(input: AddressInputModel): Promise<AddressModel> {
-    if (!input.userId) {
-      throw new InvalidDataError('No user provided', {
-        field: 'userId',
-        reason: 'A user ID is required to create an address',
-      });
-    }
     const user = await this.userDatasource.findOneById(input.userId);
+
     if (!user) {
       throw new NotFoundError('User not found!', {
         field: 'userId',
@@ -25,15 +20,6 @@ export class CreateAddressUseCase {
       });
     }
 
-    const { cep, street, streetNumber, neighborhood, city, state } = input;
-
-    if (!cep || !street || !streetNumber || !neighborhood || !city || !state) {
-      throw new InvalidDataError('Invalid input!', {
-        field: 'data',
-        reason: 'All fields are required! (Except complement)',
-      });
-    }
-  
     return this.addressDatasource.insert(input);
   }
 }

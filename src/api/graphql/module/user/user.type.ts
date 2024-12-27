@@ -8,13 +8,13 @@ export class User implements UserModel {
   @Field(() => Int, { description: 'User id' })
   id: number;
 
-  @Field({ description: 'User name' })
+  @Field(() => String, { description: 'User name' })
   name: string;
 
-  @Field({ description: 'User email' })
+  @Field(() => String, { description: 'User email' })
   email: string;
 
-  @Field({ description: 'User birth date' })
+  @Field(() => String, { description: 'User birth date' })
   birthDate: string;
 
   @Field(() => [Address], { description: 'User addresses' })
@@ -24,7 +24,7 @@ export class User implements UserModel {
 @ObjectType()
 export class Users implements PageInfo {
   @Field(() => [User], { description: 'User info' })
-  users: User[];
+  users: Partial<User>[];
 
   @Field(() => Int, { description: 'Page number' })
   page: number;
