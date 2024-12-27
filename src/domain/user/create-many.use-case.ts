@@ -134,7 +134,7 @@ export class CreateManyUsersUseCase {
 
   async sendEmails(csvData: CsvInputModel[], passwords: string[]): Promise<void> {
     for (const [i, user] of csvData.entries()) {
-      //await this.emailService.sendEmail(user.name, user.email, passwords[i]);
+      await this.emailService.sendEmail(user.name, user.email, passwords[i]);
       console.log(`Email sent to ${user.name} with the new password: ${passwords[i]}`);
     }
   }
