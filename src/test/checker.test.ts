@@ -35,6 +35,7 @@ export function checkAddress(response: AddressModel | undefined, address: Addres
     neighborhood: address?.neighborhood,
     city: address?.city,
     state: address?.state,
+    id: address?.id
   });
 }
 

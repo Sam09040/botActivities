@@ -52,6 +52,7 @@
     "reflect-metadata": "0.2.2",
     "resend": "4.0.1",
     "rimraf": "6.0.1",
+    "sinon": "19.0.2",
     "ts-jest": "29.2.5",
     "tsconfig-paths": "4.2.0",
     "type-graphql": "2.0.0-rc.2",
